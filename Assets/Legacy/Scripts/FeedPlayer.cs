@@ -1,10 +1,6 @@
-﻿using UnityEngine;
+﻿using System;
 using System.Collections;
-using System;
-
-#if !UNITY_PS4
-using UnityEngine.Networking;
-#endif
+using UnityEngine;
 
 
 /*
@@ -37,255 +33,258 @@ using UnityEngine.Networking;
 *               rules. The station must be changed, to request more music.
 * 
 */
-public class FeedPlayer : MonoBehaviour
+namespace Legacy.Scripts
 {
-	public string Token = "";
-	public string Secret = "";
-
-	public ArrayList Stations
+	public class FeedPlayer : MonoBehaviour
 	{
-		get => mSession.stations;
-		private set { }
-	}
+		public string Token = "";
+		public string Secret = "";
 
-	public float Volume 
-	{
-		get
+		public ArrayList Stations
 		{
-			return mPlayer.Volume;
+			get => mSession.stations;
+			private set { }
 		}
-		set
+
+		public float Volume 
 		{
-			if (value > 1)
+			get
 			{
-				mPlayer.Volume = 1;
+				return mPlayer.Volume;
 			}
-			else mPlayer.Volume = value;
-		}
-	} 
-	public bool Available => mSession.Available;
+			set
+			{
+				if (value > 1)
+				{
+					mPlayer.Volume = 1;
+				}
+				else mPlayer.Volume = value;
+			}
+		} 
+		public bool Available => mSession.Available;
 
-	public float CrossFadeDuration
-	{
-		get
+		public float CrossFadeDuration
 		{
-			return mPlayer.FadeDuration;
-		}
-		set
+			get
+			{
+				return mPlayer.FadeDuration;
+			}
+			set
+			{
+				mPlayer.FadeDuration = value;
+			}
+		} 
+		public Play CurrentPlay => mPlayer.CurrentPlay;
+
+		private PlayerState _state;
+		public PlayerState PlayState
 		{
-			mPlayer.FadeDuration = value;
+			get => _state;
+			private set
+			{
+				if (_state == value) return;
+				_state = value;
+				OnStateChanged?.Invoke(_state);
+			}
 		}
-	} 
-	public Play CurrentPlay => mPlayer.CurrentPlay;
 
-	private PlayerState _state;
-	public PlayerState PlayState
-	{
-		get => _state;
-		private set
-		{
-			if (_state == value) return;
-			_state = value;
-			OnStateChanged?.Invoke(_state);
-		}
-	}
+		private bool _iExaustedRaised = false;
 
-	private bool _iExaustedRaised = false;
+		private MixingAudioPlayer mPlayer;
+		private Session mSession;
 
-	private MixingAudioPlayer mPlayer;
-	private Session mSession;
+		public event StationDelegate OnStationChanged;
+		public event SessionDelegate OnSession;
+		public event StateHandler OnStateChanged;
+		public event PlayHandler OnPlayReadyForPlayback;		
+		public event PlayHandler OnPlayStarted;		
+		public event PlayHandler OnPlayCompleted;		
+		public event ProgressHandler OnProgressUpdate;
 
-	public event StationDelegate OnStationChanged;
-	public event SessionDelegate OnSession;
-	public event StateHandler OnStateChanged;
-	public event PlayHandler OnPlayReadyForPlayback;		
-	public event PlayHandler OnPlayStarted;		
-	public event PlayHandler OnPlayCompleted;		
-	public event ProgressHandler OnProgressUpdate;
-
-	public void Awake() {
+		public void Awake() {
 		
-		mPlayer =  gameObject.AddComponent<MixingAudioPlayer>();
-		mSession = gameObject.AddComponent<Session>();
-		mSession.token = Token;
-		mSession.secret = Secret;
-		mSession.onNextPlayFetched += OnNextPlayFetched;
-		mSession.onPlaysExhausted += OnPlaysExhausted;
-		mSession.onSession += OnSessionAvailibilityChanged;
-		mSession.OnSkipRequestCompleted += OnSkipRequestCompleted;
+			mPlayer =  gameObject.AddComponent<MixingAudioPlayer>();
+			mSession = gameObject.AddComponent<Session>();
+			mSession.token = Token;
+			mSession.secret = Secret;
+			mSession.onNextPlayFetched += OnNextPlayFetched;
+			mSession.onPlaysExhausted += OnPlaysExhausted;
+			mSession.onSession += OnSessionAvailibilityChanged;
+			mSession.OnSkipRequestCompleted += OnSkipRequestCompleted;
 		
-		mPlayer.OnPlayReadyForPlayback += onPlayReadyForPlayback;
-		mPlayer.OnPlayItemBeganPlayback += onPlayItemBeganPlayback;
-		mPlayer.OnPlayCompleted += onPlayCompletedByPlayer;
-		mPlayer.OnPlayFailed += onPlayFailed;
-		mPlayer.OnProgressUpdate += onProgressUpdate;
-		mPlayer.OnStateChanged += onPlayerStateChanged;
-		StartCoroutine(mSession.FetchSession());
-	}
-
-	private Play skipedPlay = null;
-	private void OnSkipRequestCompleted(bool issuccess)
-	{
-		if (issuccess)
-		{
-			skipedPlay = CurrentPlay;
-			mPlayer.Skip();
-			//mSession.RequestNext();
+			mPlayer.OnPlayReadyForPlayback += onPlayReadyForPlayback;
+			mPlayer.OnPlayItemBeganPlayback += onPlayItemBeganPlayback;
+			mPlayer.OnPlayCompleted += onPlayCompletedByPlayer;
+			mPlayer.OnPlayFailed += onPlayFailed;
+			mPlayer.OnProgressUpdate += onProgressUpdate;
+			mPlayer.OnStateChanged += onPlayerStateChanged;
+			StartCoroutine(mSession.FetchSession());
 		}
-	}
 
-	// MixingAudioPlayer events
-	private void onPlayerStateChanged(PlayerState state)
-	{
-		PlayState = state;
-	}
-	private void onPlayReadyForPlayback(Play play)
-	{
-		OnPlayReadyForPlayback?.Invoke(play);
-	}
-	private void onPlayItemBeganPlayback(Play play)
-	{
-		mSession.ReportPlayStarted(play);
-		OnPlayStarted?.Invoke(play);
-	}
-	private void onPlayCompletedByPlayer(Play play)
-	{
+		private Play skipedPlay = null;
+		private void OnSkipRequestCompleted(bool issuccess)
+		{
+			if (issuccess)
+			{
+				skipedPlay = CurrentPlay;
+				mPlayer.Skip();
+				//mSession.RequestNext();
+			}
+		}
+
+		// MixingAudioPlayer events
+		private void onPlayerStateChanged(PlayerState state)
+		{
+			PlayState = state;
+		}
+		private void onPlayReadyForPlayback(Play play)
+		{
+			OnPlayReadyForPlayback?.Invoke(play);
+		}
+		private void onPlayItemBeganPlayback(Play play)
+		{
+			mSession.ReportPlayStarted(play);
+			OnPlayStarted?.Invoke(play);
+		}
+		private void onPlayCompletedByPlayer(Play play)
+		{
 		
-		OnPlayCompleted?.Invoke(play);
-		if (skipedPlay != null && play.Id.Equals(skipedPlay.Id))
+			OnPlayCompleted?.Invoke(play);
+			if (skipedPlay != null && play.Id.Equals(skipedPlay.Id))
+			{
+				skipedPlay = null;
+				return;
+			}
+			mSession.ReportPlayCompleted(play);
+			if (_iExaustedRaised)
+			{	//Set the play state when all playback is complete
+				PlayState = PlayerState.Exhausted;
+				_iExaustedRaised = false;
+			}
+		}
+		private void onPlayFailed(Play play)
 		{
-			skipedPlay = null;
-			return;
+			mSession.RequestInvalidate(play);
 		}
-		mSession.ReportPlayCompleted(play);
-		if (_iExaustedRaised)
-		{	//Set the play state when all playback is complete
-			PlayState = PlayerState.Exhausted;
-			_iExaustedRaised = false;
+		private void onProgressUpdate(Play play, float progress, float duration)
+		{
+			OnProgressUpdate?.Invoke(play,progress,duration);
 		}
-	}
-	private void onPlayFailed(Play play)
-	{
-		mSession.RequestInvalidate(play);
-	}
-	private void onProgressUpdate(Play play, float progress, float duration)
-	{
-		OnProgressUpdate?.Invoke(play,progress,duration);
-	}
 	
 	
-	// Public interface
-	public void RequestNewClientID(ClientDelegate clientDelegate)
-	{
-		StartCoroutine(mSession.RequestNewClientID(clientDelegate));
-	}
-
-	public String GetClientID()
-	{
-		return mSession.ClientId;
-	}
-	
-	public void SetClientID(string clientID)
-	{
-		if(clientID.StartsWith(Session.EXPORT_CLIENT_ID_PREFIX))
+		// Public interface
+		public void RequestNewClientID(ClientDelegate clientDelegate)
 		{
-			mSession.ClientId = clientID;
+			StartCoroutine(mSession.RequestNewClientID(clientDelegate));
+		}
+
+		public String GetClientID()
+		{
+			return mSession.ClientId;
+		}
+	
+		public void SetClientID(string clientID)
+		{
+			if(clientID.StartsWith(Session.EXPORT_CLIENT_ID_PREFIX))
+			{
+				mSession.ClientId = clientID;
 			
+			}
 		}
-	}
 	
-	public void Play() {
-		if (PlayState == PlayerState.Uninitialized)
-		{
-			throw new Exception("Tried to begin playback before player is Available");
+		public void Play() {
+			if (PlayState == PlayerState.Uninitialized)
+			{
+				throw new Exception("Tried to begin playback before player is Available");
+			}
+			if(PlayState == PlayerState.Unavailable)
+			{
+				throw new Exception("Can't begin playback when player is UnAvailable");
+			}
+			mPlayer.Play();
 		}
-		if(PlayState == PlayerState.Unavailable)
-		{
-			throw new Exception("Can't begin playback when player is UnAvailable");
-		}
-		mPlayer.Play();
-	}
 	
-	public void Pause() {
+		public void Pause() {
 		
-		mPlayer.Pause();
-		mSession.ReportPlayElapsed(mPlayer.CurrentPlayTime);
+			mPlayer.Pause();
+			mSession.ReportPlayElapsed(mPlayer.CurrentPlayTime);
 
-	}
+		}
 	
-	public Station ActiveStation {
-		get => mSession._activeStation;
+		public Station ActiveStation {
+			get => mSession._activeStation;
 
-		set
-		{
-			var oldState = PlayState;
-			if (mSession._activeStation == value) {
+			set
+			{
+				var oldState = PlayState;
+				if (mSession._activeStation == value) {
+					return;
+				}
+
+				if (PlayState == PlayerState.Exhausted)
+				{
+					PlayState = PlayerState.WaitingForItem;
+				}
+				mPlayer.FlushAndIncludeCurrent();
+				mSession.Reset();
+				mSession._activeStation = value;
+				if(oldState != PlayerState.Uninitialized)
+					OnStationChanged?.Invoke(value);
+				mSession.RequestNext();
+
+			}
+		}
+		public void Skip() {
+			if (!mSession.HasActivePlayStarted()) {
+				// can't skip non-playing song
 				return;
 			}
 
-			if (PlayState == PlayerState.Exhausted)
-			{
-				PlayState = PlayerState.WaitingForItem;
-			}
-			mPlayer.FlushAndIncludeCurrent();
-			mSession.Reset();
-			mSession._activeStation = value;
-			if(oldState != PlayerState.Uninitialized)
-				OnStationChanged?.Invoke(value);
-			mSession.RequestNext();
-
+			mSession.RequestSkip();
 		}
-	}
-	public void Skip() {
-		if (!mSession.HasActivePlayStarted()) {
-			// can't skip non-playing song
-			return;
-		}
-
-		mSession.RequestSkip();
-	}
 	
-	private void OnNextPlayFetched(Play play) {
+		private void OnNextPlayFetched(Play play) {
 		
-		mPlayer.AddAudioAsset(play);
-	}
+			mPlayer.AddAudioAsset(play);
+		}
 
-	/*
+		/*
 	 * Take us out of pause if we've run out of songs
 	 */
 
-	private void OnPlaysExhausted(Session s)
-	{
-		if (mPlayer.State == PlayerState.WaitingForItem && mPlayer.isEmpty())
+		private void OnPlaysExhausted(Session s)
 		{
-			PlayState = PlayerState.Exhausted;
+			if (mPlayer.State == PlayerState.WaitingForItem && mPlayer.isEmpty())
+			{
+				PlayState = PlayerState.Exhausted;
+			}
+			else
+			{
+				_iExaustedRaised = true;
+			}
 		}
-		else
-		{
-			_iExaustedRaised = true;
-		}
-	}
 
-	private void OnSessionAvailibilityChanged(bool isAvailable, String errMessage)
-	{
-		if(isAvailable) ActiveStation = (Station)mSession.stations[0];
-		PlayState = isAvailable ? PlayerState.ReadyToPlay : PlayerState.Unavailable;
-		OnSession?.Invoke(isAvailable, errMessage);
+		private void OnSessionAvailibilityChanged(bool isAvailable, String errMessage)
+		{
+			if(isAvailable) ActiveStation = (Station)mSession.stations[0];
+			PlayState = isAvailable ? PlayerState.ReadyToPlay : PlayerState.Unavailable;
+			OnSession?.Invoke(isAvailable, errMessage);
 		
-	}
+		}
 
-	/* 
+		/* 
 	 * Keep track of when the audio isn't playing paused, but just in the
 	 * background
 	 */
 
-	void OnApplicationPause(bool pauseState) {		
+		void OnApplicationPause(bool pauseState) {		
 		
-	}
+		}
 
-	public bool CanSkip()
-	{
-		return mSession.MaybeCanSkip();
+		public bool CanSkip()
+		{
+			return mSession.MaybeCanSkip();
+		}
 	}
 }
 
