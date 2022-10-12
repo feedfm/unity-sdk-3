@@ -1,12 +1,14 @@
 using UnityEngine;
-using System.Collections;
 
-public class Spin : MonoBehaviour
+namespace Legacy.Scripts
 {
-    public float speed = 10f;
-
-	void Update ()
+    public class Spin : MonoBehaviour
     {
-        transform.Rotate(Vector3.up, speed * Time.deltaTime);
+        public float speed = 10f;
+
+        void Update ()
+        {
+            transform.Rotate(Vector3.up, speed * Time.deltaTime);
+        }
     }
 }
