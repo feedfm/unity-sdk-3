@@ -9,4 +9,7 @@ namespace FeedFM.Utilities
     internal delegate void StateHandler(PlayerState state);
     internal delegate void SessionDelegate(bool isAvailable, string errMsg);
     internal delegate void ClientDelegate(string clientID);
+    internal delegate void SkipDelegate(bool isSuccess);
+    internal delegate void PlayDelegate(Play data);
+    internal delegate void Handler(Session obj);
 }
