@@ -1,4 +1,5 @@
 ﻿using System;
+using FeedFM.Attributes;
 using UnityEngine;
 
 namespace FeedFM
@@ -8,8 +9,8 @@ namespace FeedFM
     [DisallowMultipleComponent]
     internal sealed class FeedPlayer : MonoBehaviour
     {
-        [SerializeField] private MixingAudioPlayer _mixingAudioPlayer = null;
-        [SerializeField] private Session _session = null;
+        [SerializeField, ReadOnly] private MixingAudioPlayer _mixingAudioPlayer = null;
+        [SerializeField, ReadOnly] private Session _session = null;
         
         private void Awake()
         {

@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections;
 using System.Collections.Generic;
+using FeedFM.Attributes;
 using FeedFM.Extensions;
 using FeedFM.Models;
 using FeedFM.Utilities;
@@ -81,7 +82,7 @@ namespace FeedFM
 *     bitrate can be set to max of 320, but this can cause delay in loading music as files are much bigger.  
 * 
 */
-
+    
     [DisallowMultipleComponent]
     internal sealed class Session : MonoBehaviour
     {
@@ -99,9 +100,8 @@ namespace FeedFM
 
         #region Configuration
 
-        public string token = string.Empty;
-
-        public string secret = string.Empty;
+        [SerializeField, ReadOnly] public string token = string.Empty;
+        [SerializeField, ReadOnly] public string secret = string.Empty;
 
         public Station _activeStation;
 
