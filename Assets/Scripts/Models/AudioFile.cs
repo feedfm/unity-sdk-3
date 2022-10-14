@@ -1,5 +1,4 @@
-﻿
-using FeedFM.Utilities;
+﻿using FeedFM.Utilities;
 
 namespace FeedFM.Models
 {
@@ -19,24 +18,27 @@ namespace FeedFM.Models
         public bool IsLiked { get; set; }
         public bool IsDisliked { get; set; }
 
-        public float trimStart
+        public float trimStart => MetaData["trim_start"].AsFloat;
+
+        public float trimEnd => MetaData["trim_end"].AsFloat;
+
+        public static AudioFile Parse(JSONClass jfile)
         {
-            get
+            return new AudioFile()
             {
-                float trim = 0.0f;
-                trim =  MetaData["trim_start"].AsFloat;
-                return trim;
-            }
+                Id = jfile["id"].AsInt,
+                ArtistTitle = jfile["artist"].AsObject["name"].Value,
+                ReleaseTitle = jfile["release"].AsObject["title"].Value,
+                TrackTitle = jfile["track"].AsObject["title"].Value,
+                Bitrate = jfile["bitrate"].Value,
+                DurationInSeconds = jfile["duration_in_seconds"].AsFloat,
+                IsDisliked = jfile["disliked"].AsBool,
+                Codec = jfile["codec"].Value,
+                Url = jfile["url"].Value,
+                IsLiked = jfile["liked"].AsBool,
+                MetaData = jfile["extra"].AsObject,
+                ReplayGain = jfile["replay_gain"].AsFloat
+            };
         }
-
-        public float trimEnd {
-            get
-            {
-                float trim = 0.0f;
-                trim =  MetaData["trim_end"].AsFloat;
-                return trim;
-            }
-        }
-
     }
 }
