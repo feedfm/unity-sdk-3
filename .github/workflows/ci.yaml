@@ -2,7 +2,7 @@ name: CI
 on:
   push:
     branches:
-    - enhancement/semantic-package-versioning
+    - feature/upm-pipeline
 jobs:
   release:
     name: release
