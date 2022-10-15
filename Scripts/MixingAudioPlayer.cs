@@ -298,7 +298,8 @@ namespace FeedFM
                         _currentAsset = null;
                     }
                 }
-                yield return new WaitForSeconds(0.5f);
+
+                yield return WaitForSecondsLibrary.HalfOfASecond;
             }
        
         }
@@ -371,7 +372,7 @@ namespace FeedFM
         
             while(_nextAsset.clip.loadState != AudioDataLoadState.Loaded)
             {
-                yield return new WaitForSeconds(0.2f);
+                yield return WaitForSecondsLibrary.GetWaitForSeconds(0.2f);
             }
             
             OnPlayReadyForPlayback?.Invoke(_nextAsset.play);
