@@ -556,11 +556,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 720bb877092e4ff894ba057ec6cae95c, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  _requiredNumberOfAudioSources: 2
-  _audioSources:
-  - {fileID: 1504221713}
-  - {fileID: 1504221712}
-  TrimmingEnabled: 1
   FadeDuration: 4
   CurrentPlayTime: 0
   CurrentPlayDuration: 0
@@ -578,3 +573,5 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   _mixingAudioPlayer: {fileID: 1504221715}
   _session: {fileID: 1504221714}
+  _token: 69b30ca4c084065fe48ad5b9d5f26046dc12c327
+  _secret: a4ac0bba1debed0d05dba8e7ddd8b086b92878a8

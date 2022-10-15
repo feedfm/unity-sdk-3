@@ -23,20 +23,19 @@ namespace FeedFM
 
         #endregion
 
-        [SerializeField, ReadOnly] private AudioSource[] _audioSources = Array.Empty<AudioSource>();
         private PlayerState _state;
-        private IEnumerator[] _faders = new IEnumerator[2];
+        private readonly IEnumerator[] _faders = new IEnumerator[2];
         private int _activeAudioSourceIndex = 0;
-        private int noOfVolumeStepsPerSecond = 60;
-        private Queue<Play> audioFileList = new Queue<Play>();
-        private bool playWhenReady = false;
-        private PlayAndClip currentAsset;
-        private PlayAndClip nextAsset;
-        private bool bUpdate;
-        private UnityWebRequest lUnityWebRequest;
+        private const int VOLUME_STEPS_PER_SECOND = 60;
+        private readonly Queue<Play> _audioFileList = new Queue<Play>();
+        private bool _playWhenReady = false;
+        private PlayAndClip _currentAsset;
+        private PlayAndClip _nextAsset;
+        private bool _bUpdate;
+        private UnityWebRequest _unityWebRequest;
         [Range(0.0f, 1.0f)]
         private float _volume = 1.0f;
-
+        private AudioSource[] _audioSources = Array.Empty<AudioSource>();
         private const int REQUIRED_NUMBER_OF_AUDIOSOURCES = 2;
     
         public PlayerState State
@@ -52,7 +51,7 @@ namespace FeedFM
     
         public float FadeDuration = 4.0f;
         public float CurrentPlayTime;
-        public Play CurrentPlay => currentAsset?.play;
+        public Play CurrentPlay => _currentAsset?.play;
         public float CurrentPlayDuration;
 
         public float Volume
@@ -66,7 +65,7 @@ namespace FeedFM
         public void Awake()
         {
             InitializeRequiredComponents();
-            bUpdate = false;
+            _bUpdate = false;
         }
 
         private void InitializeRequiredComponents()
@@ -98,7 +97,7 @@ namespace FeedFM
             }
         }
 
-        private void SetAudioSourceToDefaultValue(AudioSource audioSource)
+        private static void SetAudioSourceToDefaultValue(AudioSource audioSource)
         {
             audioSource.loop = true;
             audioSource.playOnAwake = false;
@@ -107,7 +106,7 @@ namespace FeedFM
 
         public bool IsEmpty()
         {
-            return audioFileList.Count == 0 && nextAsset == null && currentAsset == null;
+            return _audioFileList.Count == 0 && _nextAsset == null && _currentAsset == null;
         }
         
         public void AddAudioAsset(Play play)
@@ -115,9 +114,9 @@ namespace FeedFM
 #if UNITY_EDITOR
             Debug.LogFormat("Add Asset {0}", play.AudioFile.TrackTitle);
 #endif
-            audioFileList.Enqueue(play);
+            _audioFileList.Enqueue(play);
 
-            if (nextAsset == null)
+            if (_nextAsset == null)
             {
                 StartCoroutine(LoadNext());
             }
@@ -125,16 +124,17 @@ namespace FeedFM
 
         public void Play()
         {
-            playWhenReady = true;
+            _playWhenReady = true;
+            
             switch (State)
             {
                 case PlayerState.Playing:
                     return;
                 case PlayerState.ReadyToPlay:
                 
-                    if (nextAsset != null)
+                    if (_nextAsset != null)
                     {
-                        LoadAudioClipWithFade(nextAsset);
+                        LoadAudioClipWithFade(_nextAsset);
                     }
                     else
                     {
@@ -143,22 +143,22 @@ namespace FeedFM
                 
                     break;
                 case PlayerState.Paused:
-                    if (currentAsset != null)
+                    if (_currentAsset != null)
                     {
-                        playWhenReady = true;
+                        _playWhenReady = true;
                         ActiveAudioSource.Play();
                     }
-                    else if(nextAsset != null)
+                    else if(_nextAsset != null)
                     {
-                        LoadAudioClipWithFade(nextAsset);
+                        LoadAudioClipWithFade(_nextAsset);
                     }
                 
                     break;
                 default:
                 {
-                    if(nextAsset == null && currentAsset == null)
+                    if(_nextAsset == null && _currentAsset == null)
                     {
-                        if (audioFileList.Count == 0)
+                        if (_audioFileList.Count == 0)
                         {
                             State = PlayerState.WaitingForItem;
                         }
@@ -171,9 +171,9 @@ namespace FeedFM
                     break;
                 }
             }
-            if (!bUpdate)
+            if (!_bUpdate)
             {
-                bUpdate = true;
+                _bUpdate = true;
                 StartCoroutine(UpdateState());
             }
         }
@@ -181,24 +181,24 @@ namespace FeedFM
     
         public void Pause()
         {
-            playWhenReady = false;
+            _playWhenReady = false;
             ActiveAudioSource.Pause();
             State = PlayerState.Paused;
-            bUpdate = false;
+            _bUpdate = false;
         }
 
         public void Skip()
         {
-            if (nextAsset != null)
+            if (_nextAsset != null)
             {
-                LoadAudioClipWithFade(nextAsset);
+                LoadAudioClipWithFade(_nextAsset);
             }
             else
             {
                 State = PlayerState.WaitingForItem;
-                OnPlayCompleted?.Invoke(currentAsset.play);
+                OnPlayCompleted?.Invoke(_currentAsset.play);
                 ActiveAudioSource.Stop();
-                currentAsset = null;
+                _currentAsset = null;
             
             }
         }
@@ -213,8 +213,8 @@ namespace FeedFM
     
         public void Flush()
         {
-            audioFileList.Clear();
-            nextAsset = null;
+            _audioFileList.Clear();
+            _nextAsset = null;
         }
 
         public void FlushAndIncludeCurrent()
@@ -224,7 +224,7 @@ namespace FeedFM
 #endif
             if(State == PlayerState.Playing)
             {
-                OnPlayCompleted?.Invoke(currentAsset.play);
+                OnPlayCompleted?.Invoke(_currentAsset.play);
                 SetVolumeOfAllAudioSourcesToZero();
                 State = PlayerState.WaitingForItem;
             }
@@ -235,10 +235,10 @@ namespace FeedFM
 
             StopAndFlushAllAudioSources();
         
-            lUnityWebRequest?.Abort();
-            audioFileList.Clear();
-            currentAsset = null;
-            nextAsset = null;
+            _unityWebRequest?.Abort();
+            _audioFileList.Clear();
+            _currentAsset = null;
+            _nextAsset = null;
         }
 
         private void SetVolumeOfAllAudioSourcesToZero()
@@ -257,7 +257,7 @@ namespace FeedFM
             }
         }
 
-        private void StopAndFlushAudioSource(AudioSource audioSource)
+        private static void StopAndFlushAudioSource(AudioSource audioSource)
         {
             audioSource.Stop();
             audioSource.clip = null;
@@ -265,7 +265,7 @@ namespace FeedFM
 
         private IEnumerator UpdateState()
         {
-            while (bUpdate)
+            while (_bUpdate)
             {
                 if (ActiveAudioSource.isPlaying && State != PlayerState.Playing)
                 {
@@ -279,23 +279,23 @@ namespace FeedFM
                     OnProgressUpdate?.Invoke(CurrentPlay, ActiveAudioSource.time, CurrentPlayDuration);
                 }
 
-                if (currentAsset != null && nextAsset != null)
+                if (_currentAsset != null && _nextAsset != null)
                 {
-                    var msUntilFade = CurrentPlayDuration - FadeDuration - CurrentPlayTime - currentAsset.play.AudioFile.trimEnd;
+                    var msUntilFade = CurrentPlayDuration - FadeDuration - CurrentPlayTime - _currentAsset.play.AudioFile.trimEnd;
                     if (msUntilFade <= 0)
                     {
-                        LoadAudioClipWithFade(nextAsset);
+                        LoadAudioClipWithFade(_nextAsset);
                     }
                 }
-                else if(currentAsset != null && nextAsset == null)
+                else if(_currentAsset != null && _nextAsset == null)
                 {
                     if (!ActiveAudioSource.isPlaying && (ActiveAudioSource.time == 0f)) {
                         // The track ended
                         State = PlayerState.WaitingForItem;
-                        OnPlayCompleted?.Invoke(currentAsset.play);
+                        OnPlayCompleted?.Invoke(_currentAsset.play);
                         StopAndFlushAudioSource(ActiveAudioSource);
                         // Is the next song playing
-                        currentAsset = null;
+                        _currentAsset = null;
                     }
                 }
                 yield return new WaitForSeconds(0.5f);
@@ -305,11 +305,11 @@ namespace FeedFM
 
         private IEnumerator LoadNext()
         {
-            if (audioFileList.Count > 0 && nextAsset == null)
+            if (_audioFileList.Count > 0 && _nextAsset == null)
             {
-                var audioTrack = audioFileList.Dequeue();
+                var audioTrack = _audioFileList.Dequeue();
                 
-                nextAsset = new PlayAndClip();
+                _nextAsset = new PlayAndClip();
             
                 if(!ActiveAudioSource.isPlaying)
                 {
@@ -317,14 +317,14 @@ namespace FeedFM
                 }
                 // start loading up the song
             
-                lUnityWebRequest = UnityWebRequestMultimedia.GetAudioClip(audioTrack.AudioFile.Url, AudioType.MPEG); // TODO: Ask about AudioType
-                yield return lUnityWebRequest.SendWebRequest();
+                _unityWebRequest = UnityWebRequestMultimedia.GetAudioClip(audioTrack.AudioFile.Url, AudioType.MPEG); // TODO: Ask about AudioType
+                yield return _unityWebRequest.SendWebRequest();
             
                 AudioClip clip = null;
 
                 try
                 {
-                    clip = DownloadHandlerAudioClip.GetContent(lUnityWebRequest);
+                    clip = DownloadHandlerAudioClip.GetContent(_unityWebRequest);
                 }
                 catch (Exception e)
                 {
@@ -338,7 +338,7 @@ namespace FeedFM
                     yield break;
                 }
 
-                lUnityWebRequest = null;
+                _unityWebRequest = null;
             
                 if (!clip)
                 {
@@ -348,15 +348,15 @@ namespace FeedFM
             
                 // Ready to play
 
-                if (nextAsset == null)
+                if (_nextAsset == null)
                 {
                     yield break;
                 }
             
-                nextAsset.play = audioTrack;
-                nextAsset.clip = clip;
+                _nextAsset.play = audioTrack;
+                _nextAsset.clip = clip;
 
-                nextAsset.clip.LoadAudioData();
+                _nextAsset.clip.LoadAudioData();
                 StartCoroutine(CheckLoadState());
 
             }
@@ -364,17 +364,17 @@ namespace FeedFM
 
         private IEnumerator CheckLoadState()
         {
-            if (nextAsset == null)
+            if (_nextAsset == null)
             {
                 yield break;
             }
         
-            while(nextAsset.clip.loadState != AudioDataLoadState.Loaded)
+            while(_nextAsset.clip.loadState != AudioDataLoadState.Loaded)
             {
                 yield return new WaitForSeconds(0.2f);
             }
             
-            OnPlayReadyForPlayback?.Invoke(nextAsset.play);
+            OnPlayReadyForPlayback?.Invoke(_nextAsset.play);
         
             if (State == PlayerState.Uninitialized)
             {
@@ -383,9 +383,9 @@ namespace FeedFM
             
             if (State == PlayerState.ReadyToPlay || State == PlayerState.WaitingForItem || State == PlayerState.Stalled )
             { 
-                if(playWhenReady)
+                if(_playWhenReady)
                 {
-                    LoadAudioClipWithFade(nextAsset);
+                    LoadAudioClipWithFade(_nextAsset);
                 }
                 else
                 {
@@ -405,16 +405,16 @@ namespace FeedFM
             StopAllFadeCoroutines();
             
             //Fade-out the active play, if it is not silent (eg: first start)
-            if (currentAsset != null)
+            if (_currentAsset != null)
             {
-                OnPlayCompleted?.Invoke(currentAsset.play);
+                OnPlayCompleted?.Invoke(_currentAsset.play);
                 _faders[0] = FadeOutAudioSourceNoAlloc(ActiveAudioSource, FadeDuration, 0.0f);
                 StartCoroutine(_faders[0]);
             }
         
-            currentAsset = asset;
-            nextAsset = null;
-            CurrentPlayDuration = currentAsset.clip.length;
+            _currentAsset = asset;
+            _nextAsset = null;
+            CurrentPlayDuration = _currentAsset.clip.length;
 
             //Fade-in the new clip
             int nextPlayer = (_activeAudioSourceIndex + 1) % _audioSources.Length;
@@ -427,7 +427,7 @@ namespace FeedFM
             }
             nextAudioSource.Play();
             // Song started
-            OnPlayItemBeganPlayback?.Invoke(currentAsset.play);
+            OnPlayItemBeganPlayback?.Invoke(_currentAsset.play);
             _faders[1] = FadeInAudioSourceNoAlloc(nextAudioSource, FadeDuration, Volume);
             StartCoroutine(_faders[1]);
 
@@ -467,10 +467,10 @@ namespace FeedFM
             _faders[1] = null;
         }
 
-        private IEnumerator FadeAudioSourceNoAlloc(AudioSource player, float duration, float targetVolume)
+        private static IEnumerator FadeAudioSourceNoAlloc(AudioSource player, float duration, float targetVolume)
         {
             //Calculate the steps
-            int steps = (int)(noOfVolumeStepsPerSecond * duration);
+            int steps = (int)(VOLUME_STEPS_PER_SECOND * duration);
             float stepTime = duration / steps;
             float stepSize = (targetVolume - player.volume) / steps;
 
