@@ -107,23 +107,21 @@ namespace FeedFM
         #endregion
 
         /** Internal state **/
-        private string apiServerBase = "https://feed.fm/api/v2";
-
-        private string formats = "m4a,mp3"; // default
-
+        private const string API_SERVER_BASE = "https://feed.fm/api/v2";
+        private const string AUDIO_FORMATS = "m4a,mp3"; // default
         private string _baseClientId;
 
         /// <summary>
         /// 64 is a good balance between audio quality and bandwidth usage. 
         /// </summary>
-        private string maxBitrate = "128";
+        private const string MAX_BITRATE = "128";
 
-        private Placement placement { get; set; }
+        private Placement Placement { get; set; }
         public List<Station> stations { get; private set; }
 
-        private SessionStatus lastStatus;
-        private PendingRequest pendingRequest;
-        private PendingRequest pendingSessionRequest;
+        private SessionStatus _lastStatus;
+        private PendingRequest _pendingRequest;
+        private PendingRequest _pendingSessionRequest;
         public const string EXPORT_CLIENT_ID_PREFIX = "fmcidv1:";
         private string _fullClientId = string.Empty;
 
@@ -150,14 +148,13 @@ namespace FeedFM
 
         public bool Available { get; private set; }
 
-
         #region Public API
 
         public void Awake()
         {
             // we haven't started playing any music yet
             startedPlayback = false;
-            pendingSessionRequest = new PendingRequest();
+            _pendingSessionRequest = new PendingRequest();
             // pessimistically assume we're out of the US
             Available = false;
             ResetClientId();
@@ -166,9 +163,9 @@ namespace FeedFM
 
         public IEnumerator FetchSession()
         {
-            Ajax ajax = new Ajax(Ajax.RequestType.POST, apiServerBase + "/session");
+            Ajax ajax = new Ajax(Ajax.RequestType.POST, API_SERVER_BASE + "/session");
 
-            while (pendingSessionRequest.retryCount < _maxNumberOfRetries)
+            while (_pendingSessionRequest.retryCount < _maxNumberOfRetries)
             {
                 yield return StartCoroutine(SignedRequest(ajax));
 
@@ -182,7 +179,7 @@ namespace FeedFM
                             _baseClientId = ajax.GetClientIDFromResponseSession();
                             PlayerPrefs.SetString("feedfm.client_id", _baseClientId);
 
-                            placement = ajax.GetPlacementFromResponse();
+                            Placement = ajax.GetPlacementFromResponse();
 
                             stations = ajax.GetStations();
                             onSession?.Invoke(true, string.Empty);
@@ -201,7 +198,7 @@ namespace FeedFM
                     yield break;
                 }
 
-                lastStatus.retryCount++;
+                _lastStatus.retryCount++;
                 yield return new WaitForSeconds(2.0f);
             }
 
@@ -220,7 +217,7 @@ namespace FeedFM
         public void ReportPlayStarted(Play play)
         {
             startedPlayback = true;
-            lastStatus = new SessionStatus
+            _lastStatus = new SessionStatus
             {
                 play = play,
                 started = false
@@ -241,12 +238,12 @@ namespace FeedFM
         /// </summary>
         public void ReportPlayElapsed(float seconds)
         {
-            if (lastStatus == null)
+            if (_lastStatus == null)
             {
                 throw new Exception("Attempt to report elapsed play time, but the pay hasn't started");
             }
 
-            Ajax ajax = new Ajax(Ajax.RequestType.POST, string.Format("{0}/play/{1}/elapse", apiServerBase, lastStatus.play.Id));
+            Ajax ajax = new Ajax(Ajax.RequestType.POST, string.Format("{0}/play/{1}/elapse", API_SERVER_BASE, _lastStatus.play.Id));
             ajax.addParameter("seconds", seconds.ToString());
 
             StartCoroutine(SignedRequest(ajax));
@@ -265,18 +262,18 @@ namespace FeedFM
         /// </summary>
         public void RequestSkip()
         {
-            if (lastStatus == null)
+            if (_lastStatus == null)
             {
                 return;
             }
 
-            if (!lastStatus.canSkip)
+            if (!_lastStatus.canSkip)
             {
                 OnSkipRequestCompleted?.Invoke(false);
                 return;
             }
 
-            StartCoroutine(SkipPlay(lastStatus.play));
+            StartCoroutine(SkipPlay(_lastStatus.play));
         }
 
         public void RequestInvalidate(Play play)
@@ -317,15 +314,15 @@ namespace FeedFM
         {
             while (true)
             {
-                Ajax ajax = new Ajax(Ajax.RequestType.POST, string.Format("{0}/play/{1}/start", apiServerBase, play.Id));
+                Ajax ajax = new Ajax(Ajax.RequestType.POST, string.Format("{0}/play/{1}/start", API_SERVER_BASE, play.Id));
 
                 yield return StartCoroutine(SignedRequest(ajax));
 
                 if (ajax.success)
                 {
-                    lastStatus.canSkip = ajax.GetCanSkipFromResponseSession();
-                    lastStatus.play = play;
-                    lastStatus.started = true;
+                    _lastStatus.canSkip = ajax.GetCanSkipFromResponseSession();
+                    _lastStatus.play = play;
+                    _lastStatus.started = true;
 
                     // start looking for the next song
                     yield return StartCoroutine(RequestNextPlay());
@@ -336,8 +333,8 @@ namespace FeedFM
                 {
                     // we appear to have missed the response to the original start.
                     // assume the song was good
-                    lastStatus.canSkip = true;
-                    lastStatus.started = true;
+                    _lastStatus.canSkip = true;
+                    _lastStatus.started = true;
 
                     // start looking for the next song
                     yield return StartCoroutine(RequestNextPlay());
@@ -346,7 +343,7 @@ namespace FeedFM
                 }
                 else
                 {
-                    lastStatus.retryCount++;
+                    _lastStatus.retryCount++;
 
                     yield return new WaitForSeconds(2.0f);
 
@@ -360,7 +357,7 @@ namespace FeedFM
         /// </summary>
         private IEnumerator CompletePlay(Play play)
         {
-            Ajax ajax = new Ajax(Ajax.RequestType.POST, string.Format("{0}/play/{1}/complete", apiServerBase, play.Id));
+            Ajax ajax = new Ajax(Ajax.RequestType.POST, string.Format("{0}/play/{1}/complete", API_SERVER_BASE, play.Id));
 
             yield return StartCoroutine(SignedRequest(ajax));
 
@@ -372,7 +369,7 @@ namespace FeedFM
         /// </summary>
         private IEnumerator SkipPlay(Play play)
         {
-            Ajax ajax = new Ajax(Ajax.RequestType.POST, string.Format("{0}/play/{1}/skip", apiServerBase, play.Id));
+            Ajax ajax = new Ajax(Ajax.RequestType.POST, string.Format("{0}/play/{1}/skip", API_SERVER_BASE, play.Id));
 
             yield return StartCoroutine(SignedRequest(ajax));
 
@@ -391,11 +388,11 @@ namespace FeedFM
 
             while (true)
             {
-                Ajax ajax = new Ajax(Ajax.RequestType.POST, string.Format("{0}/play/{1}/invalidate", apiServerBase, play.Id));
+                Ajax ajax = new Ajax(Ajax.RequestType.POST, string.Format("{0}/play/{1}/invalidate", API_SERVER_BASE, play.Id));
 
                 yield return StartCoroutine(SignedRequest(ajax));
 
-                if (lastStatus == null || lastStatus.play != play)
+                if (_lastStatus == null || _lastStatus.play != play)
                 {
                     // nobody cares about this song any more
                     yield break;
@@ -421,7 +418,7 @@ namespace FeedFM
         /// </summary>
         private IEnumerator RequestNextPlay()
         {
-            if (pendingRequest != null)
+            if (_pendingRequest != null)
             {
                 // We're already waiting for a play to come in
                 yield break;
@@ -429,14 +426,14 @@ namespace FeedFM
 
             while (_baseClientId != null)
             {
-                Ajax ajax = new Ajax(Ajax.RequestType.POST, apiServerBase + "/play")
-                    .addParameter("formats", formats)
+                Ajax ajax = new Ajax(Ajax.RequestType.POST, API_SERVER_BASE + "/play")
+                    .addParameter("formats", AUDIO_FORMATS)
                     .addParameter("client_id", _baseClientId)
-                    .addParameter("max_bitrate", maxBitrate);
+                    .addParameter("max_bitrate", MAX_BITRATE);
 
-                if (placement != null)
+                if (Placement != null)
                 {
-                    ajax.addParameter("placement_id", placement.id.ToString());
+                    ajax.addParameter("placement_id", Placement.id.ToString());
                 }
 
                 if (_activeStation != null)
@@ -445,7 +442,7 @@ namespace FeedFM
                 }
 
                 // let the rest of the code know we're awaiting a response
-                pendingRequest = new PendingRequest
+                _pendingRequest = new PendingRequest
                 {
                     ajax = ajax,
                     retryCount = 0
@@ -453,7 +450,7 @@ namespace FeedFM
 
                 yield return StartCoroutine(SignedRequest(ajax));
 
-                if (pendingRequest == null || pendingRequest.ajax != ajax)
+                if (_pendingRequest == null || _pendingRequest.ajax != ajax)
                 {
                     // another request snuck in while waiting for the response to this one,
                     // so we don't care about this one any more - just quit
@@ -461,7 +458,7 @@ namespace FeedFM
                 }
                 else if (ajax.success)
                 {
-                    pendingRequest = null;
+                    _pendingRequest = null;
                     onNextPlayFetched?.Invoke(ajax.GetPlayFromResponseSession());
                     yield break;
                 }
@@ -471,14 +468,14 @@ namespace FeedFM
                     {
                         case FeedError.NoMoreMusic:
                         {
-                            if (lastStatus == null)
+                            if (_lastStatus == null)
                             {
                                 // ran out of music, and nothing else to play
                                 exhausted = true;
                                 onPlaysExhausted?.Invoke(this);
                             }
 
-                            pendingRequest = null;
+                            _pendingRequest = null;
 
                             yield break;
                         }
@@ -492,10 +489,10 @@ namespace FeedFM
                         default:
                         {
                             // some unknown error 
-                            pendingRequest.retryCount++;
+                            _pendingRequest.retryCount++;
 
                             // wait for an increasingly long time before retrying
-                            yield return new WaitForSeconds(0.5f * (float) Math.Pow(2.0, pendingRequest.retryCount));
+                            yield return new WaitForSeconds(0.5f * (float) Math.Pow(2.0, _pendingRequest.retryCount));
                             break;
                         }
                     }
@@ -509,7 +506,7 @@ namespace FeedFM
         /// <returns></returns>
         public bool IsRequestingPlay()
         {
-            return (lastStatus != null) || (pendingRequest != null);
+            return (_lastStatus != null) || (_pendingRequest != null);
         }
 
         /// <summary>
@@ -517,13 +514,13 @@ namespace FeedFM
         /// </summary>
         public bool HasActivePlayStarted()
         {
-            return (lastStatus != null) && (lastStatus.started);
+            return (_lastStatus != null) && (_lastStatus.started);
         }
 
         /// <summary>
         /// Return the currently active play, or null
         /// </summary>
-        public Play GetActivePlay() => lastStatus?.play;
+        public Play GetActivePlay() => _lastStatus?.play;
 
         /// <summary>
         /// Reset the cached client id. *for testing only!
@@ -553,7 +550,7 @@ namespace FeedFM
 
             while (true)
             {
-                Ajax ajax = new Ajax(Ajax.RequestType.POST, apiServerBase + "/client");
+                Ajax ajax = new Ajax(Ajax.RequestType.POST, API_SERVER_BASE + "/client");
 
                 yield return StartCoroutine(SignedRequest(ajax));
 
@@ -587,23 +584,23 @@ namespace FeedFM
 
         public bool MaybeCanSkip()
         {
-            return ((lastStatus != null) && (lastStatus.started) && (lastStatus.canSkip));
+            return ((_lastStatus != null) && (_lastStatus.started) && (_lastStatus.canSkip));
         }
 
         public void Reset()
         {
             // abort any pending requests or plays
-            pendingRequest = null;
+            _pendingRequest = null;
             // pretend we've got music available
             exhausted = false;
-            lastStatus = null;
+            _lastStatus = null;
             // no music has started yet
             startedPlayback = false;
         }
 
         public IEnumerator RequestNewClientID(ClientDelegate clientDelegate)
         {
-            Ajax ajax = new Ajax(Ajax.RequestType.POST, apiServerBase + "/client");
+            Ajax ajax = new Ajax(Ajax.RequestType.POST, API_SERVER_BASE + "/client");
 
             yield return StartCoroutine(SignedRequest(ajax));
 
