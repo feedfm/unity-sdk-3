@@ -18,7 +18,10 @@ using UnityEngine.Networking;
 
 namespace FeedFM.Utilities
 {
-   public class Ajax {
+   public class Ajax
+   {
+      private string _requestDownloadHandlerText = string.Empty;
+      
       /*
 	 * Request parameters
 	 */
@@ -40,7 +43,7 @@ namespace FeedFM.Utilities
       private Dictionary <string, string> fields	= new Dictionary <string, string>();
       private Dictionary <string, string> headers	= new Dictionary <string, string>();
 
-      private UnityWebRequest request;
+      // private UnityWebRequest request;
    
 
       /*
@@ -90,77 +93,109 @@ namespace FeedFM.Utilities
 
       public IEnumerator Request()
       {
-
-         fields.Add("force200", "1");
-
-         if (type == RequestType.POST) 
+         UnityWebRequest request = null;
+         
+         try
          {
-            WWWForm form = new WWWForm();
-            if (fields.Count == 0)
+            fields.Add("force200", "1");
+
+            if (type == RequestType.POST)
             {
-               form.AddField("ju", "nk");
-            } 
-            else 
-            {
-               foreach (KeyValuePair <string, string> kp in fields) {
-                  form.AddField(kp.Key, kp.Value);
+               WWWForm form = new WWWForm();
+               if (fields.Count == 0)
+               {
+                  form.AddField("ju", "nk");
+               }
+               else
+               {
+                  foreach (KeyValuePair<string, string> kp in fields)
+                  {
+                     form.AddField(kp.Key, kp.Value);
+                  }
+               }
+
+               //setRequestHeader("Content-Type", "application/x-www-form-urlencoded");
+               request = UnityWebRequest.Post(url, form);
+               //request.SetRequestHeader("content-type", "multipart/form-data;");
+               request.SetRequestHeader("Content-Type", "application/x-www-form-urlencoded");
+               foreach (KeyValuePair<string, string> kp in headers)
+               {
+                  request.SetRequestHeader(kp.Key, kp.Value);
                }
             }
-            //setRequestHeader("Content-Type", "application/x-www-form-urlencoded");
-            request = UnityWebRequest.Post(url, form);
-            //request.SetRequestHeader("content-type", "multipart/form-data;");
-            request.SetRequestHeader("Content-Type", "application/x-www-form-urlencoded");
-            foreach (KeyValuePair <string, string> kp in headers) {
-               request.SetRequestHeader(kp.Key, kp.Value);
+            else
+            {
+               if (fields != null)
+               {
+                  url = $"{url}{fields.ToQueryString()}";
+               }
+
+               request = UnityWebRequest.Get(url);
+               foreach (KeyValuePair<string, string> kp in headers)
+               {
+                  request.SetRequestHeader(kp.Key, kp.Value);
+               }
             }
-         } else {
-            if (fields != null) {
-               url = $"{url}{fields.ToQueryString()}";
+
+            request.downloadHandler = (DownloadHandler) new DownloadHandlerBuffer();
+            yield return request.SendWebRequest();
+            _requestDownloadHandlerText = request.downloadHandler.text;
+            if (request.result == UnityWebRequest.Result.ConnectionError)
+            {
+               //Debug.Log(request.error);
+               success = false;
+               error = 500;
+               errorMessage = _requestDownloadHandlerText;
+               yield break;
             }
-            request = UnityWebRequest.Get(url);
-            foreach (KeyValuePair <string, string> kp in headers) {
-               request.SetRequestHeader(kp.Key, kp.Value);
+#if !UNITY_PS4 || UNITY_EDITOR
+            else if (request.result == UnityWebRequest.Result.ConnectionError)
+            {
+               //Debug.Log(request.error);
+               success = false;
+               error = 500;
+               errorMessage = _requestDownloadHandlerText;
+               yield break;
+            }
+#endif
+            else
+            {
+               try
+               {
+                  // all responses should be JSON
+                  response = JSONNode.Parse(_requestDownloadHandlerText);
+                  if (response["success"].AsBool)
+                  {
+                     success = true;
+                     error = (int) FeedError.None;
+                     yield break;
+                  }
+                  else
+                  {
+                     success = false;
+                     error = response["error"]["code"].AsInt;
+                     errorMessage = response["error"]["message"];
+
+                     yield break;
+                  }
+               }
+               catch (Exception ex)
+               {
+                  success = false;
+                  error = (int) FeedError.UndefinedError;
+                  errorMessage = ex.Message;
+                  yield break;
+               }
             }
          }
-         request.downloadHandler = (DownloadHandler) new DownloadHandlerBuffer();
-         yield return request.SendWebRequest();
-
-         if ( request.result == UnityWebRequest.Result.ConnectionError ) {
-            //Debug.Log(request.error);
-            success		= false;
-            error			= 500;
-            errorMessage	= request.downloadHandler.text;
-            yield break;
-         } 
-#if !UNITY_PS4 || UNITY_EDITOR
-         else if (request.result == UnityWebRequest.Result.ConnectionError) {
-            //Debug.Log(request.error);
-            success		= false;
-            error			= 500;
-            errorMessage	= request.downloadHandler.text;
-            yield break;
-         } 
+         finally
+         {
+            if (request != null)
+            {
+               request.Dispose();
+#if UNITY_EDITOR
+               Debug.LogErrorFormat("Finally");
 #endif
-         else {
-            try {
-               // all responses should be JSON
-               response = JSONNode.Parse(request.downloadHandler.text);
-               if (response["success"].AsBool) {
-                  success = true;
-                  error = (int) FeedError.None;
-                  yield break;
-               } else {
-                  success		= false;
-                  error		= response["error"]["code"].AsInt;
-                  errorMessage = response["error"]["message"];
-
-                  yield break;
-               }
-            } catch(Exception ex) {
-               success = false;
-               error = (int)FeedError.UndefinedError;
-               errorMessage = ex.Message;
-               yield break;
             }
          }
       }
@@ -169,9 +204,9 @@ namespace FeedFM.Utilities
       {
 #if UNITY_EDITOR
          if (success) {
-            Debug.Log("Request:" + request.url +"\n"+ "Response: " + request.downloadHandler.text);
+            Debug.Log(string.Format("Request:{0}\n" + "Response: {1}", url, _requestDownloadHandlerText));
          } else {
-            Debug.Log("Request:" + request.url +"\n"+ "Error id " + error + ", Response: " + request.downloadHandler.text);
+            Debug.Log(string.Format("Request:{0}\n" + "Error id {1}, Response: {2}", url, error, _requestDownloadHandlerText));
          }
 #endif
       }
