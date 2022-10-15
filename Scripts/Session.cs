@@ -60,7 +60,7 @@ namespace FeedFM
 *   - stations - list of stations in the current Session
 *   - station - the current station we're tuned to (if any)
 *   - exhausted - if we've run out of music from the current station, this will be set
-*      to true until we change to a diffrent station
+*      to true until we change to a different station
 * 
 *   - MaybeCanSkip() - returns true if we think the user can skip the current song. Note
 *      that we don't really know for sure if we can skip a song until the server tells us.
@@ -87,7 +87,7 @@ namespace FeedFM
     internal sealed class Session : MonoBehaviour
     {
         [SerializeField] private int _maxNumberOfRetries = 3;
-
+        
         #region Events
 
         public event SessionDelegate onSession; // placement data was retrieved from the server
@@ -96,7 +96,6 @@ namespace FeedFM
         public event Handler onPlaysExhausted; // the server has no more songs for us in the current station
 
         #endregion
-
 
         #region Configuration
 

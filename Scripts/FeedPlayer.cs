@@ -41,10 +41,18 @@ namespace FeedFM
 #if UNITY_EDITOR
         private void Reset()
         {
-            UnityEditorInternal.ComponentUtility.MoveComponentUp(this);
-            UnityEditorInternal.ComponentUtility.MoveComponentUp(this);
-            
             InitializeRequiredComponents();
+            
+            while (UnityEditorInternal.ComponentUtility.MoveComponentUp(this))
+            {
+                // Move AudioSource component to bottom
+            }
+            
+            if (_mixingAudioPlayer)
+            {
+                
+                _mixingAudioPlayer.Reset();
+            }
         }
 #endif
     }
