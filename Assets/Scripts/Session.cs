@@ -199,7 +199,7 @@ namespace FeedFM
                 }
 
                 _lastStatus.retryCount++;
-                yield return new WaitForSeconds(2.0f);
+                yield return WaitForSecondsLibrary.TwoSeconds;
             }
 
             onSession?.Invoke(false, "Failed to establish connection");
@@ -345,7 +345,7 @@ namespace FeedFM
                 {
                     _lastStatus.retryCount++;
 
-                    yield return new WaitForSeconds(2.0f);
+                    yield return WaitForSecondsLibrary.TwoSeconds;
 
                     // try again later
                 }
@@ -578,7 +578,7 @@ namespace FeedFM
                 }
 
                 // no success, so wait bit and then try again
-                yield return new WaitForSeconds(1.0f);
+                yield return WaitForSecondsLibrary.OneSecond;
             }
         }
 
