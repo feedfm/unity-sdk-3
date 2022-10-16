@@ -1,7 +1,7 @@
 {
     "name": "com.feedfm.unity-sdk",
     "displayName": "FeedFM Unity SDK",
-    "version": "0.0.1",
+    "version": "0.0.2",
     "unity": "2018.4",
     "description": "The unity sdk for https://www.feed.fm.",
     "keywords": [ "music", "sdk", "feed", "audio game" ],
