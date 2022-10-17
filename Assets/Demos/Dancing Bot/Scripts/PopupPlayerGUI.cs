@@ -43,7 +43,9 @@ namespace FeedFM.Demos.Dancing_Bot.Scripts
 				}
 				else
 				{
+#if UNITY_EDITOR
 					Debug.Log(errMessage);
+#endif
 				}
 			};
 		
@@ -62,17 +64,23 @@ namespace FeedFM.Demos.Dancing_Bot.Scripts
 
 			feedAudioPlayer.OnPlayReadyForPlayback += play =>
 			{
+#if UNITY_EDITOR
 				Debug.Log("play ready for playback "+play.AudioFile.TrackTitle);
+#endif
 			};
 		
 			feedAudioPlayer.OnStateChanged += state =>
 			{
+#if UNITY_EDITOR
 				Debug.Log("State Changed to "+ state);
+#endif
 			};
 		
 			feedAudioPlayer.OnProgressUpdate += (play, progress, duration) =>  {
-			
+
+#if UNITY_EDITOR
 				Debug.Log(play.AudioFile.TrackTitle+ "progress changed to " +progress + " duration " + duration);
+#endif
 			};
 		
 			var windowWidth = 300;
@@ -96,8 +104,7 @@ namespace FeedFM.Demos.Dancing_Bot.Scripts
 					if (play != null)
 					{
 						GUI.Box(new Rect(50, 0, Screen.width - 50, 50),
-							play.AudioFile.TrackTitle + " by " + play.AudioFile.ArtistTitle + " on " +
-							play.AudioFile.ReleaseTitle);
+							$"{play.AudioFile.TrackTitle} by {play.AudioFile.ArtistTitle} on {play.AudioFile.ReleaseTitle}");
 					}
 				}
 
