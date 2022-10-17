@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using UnityEngine;
 
 namespace FeedFM.Utilities
@@ -16,29 +17,45 @@ namespace FeedFM.Utilities
             { 100, new WaitForSeconds(1F / 100) },
             { 120, new WaitForSeconds(1F / 120) }
         };
-        
-        private static readonly Dictionary<float, WaitForSeconds> WaitCache = new Dictionary<float, WaitForSeconds>
+
+        private static readonly Dictionary<float, WaitForSeconds> WaitCache = GetInitialCache();
+
+        private static Dictionary<float, WaitForSeconds> GetInitialCache()
         {
-            { 0.1f, new WaitForSeconds(0.1f) },
-            { 0.2f, new WaitForSeconds(0.2f) },
-            { 0.25f, new WaitForSeconds(0.25f) },
-            { 0.3f, new WaitForSeconds(0.3f) },
-            { 0.33f, new WaitForSeconds(0.33f) },
-            { 0.5f, new WaitForSeconds(0.5f) },
-            { 1, new WaitForSeconds(1) },
-            { 2, new WaitForSeconds(2) },
-            { 3, new WaitForSeconds(3) },
-            { 4, new WaitForSeconds(4) },
-            { 5, new WaitForSeconds(5) },
-            { 10, new WaitForSeconds(10) },
-            { 15, new WaitForSeconds(15) },
-            { 20, new WaitForSeconds(20) },
-            { 25, new WaitForSeconds(25) },
-            { 30, new WaitForSeconds(30) },
-            { 60, new WaitForSeconds(60) },
-            { 100, new WaitForSeconds(100) },
-            { 120, new WaitForSeconds(120) }
-        };
+           var cache = new Dictionary<float, WaitForSeconds>
+            {
+                { 0.1f, new WaitForSeconds(0.1f) },
+                { 0.2f, new WaitForSeconds(0.2f) },
+                { 0.25f, new WaitForSeconds(0.25f) },
+                { 0.3f, new WaitForSeconds(0.3f) },
+                { 0.33f, new WaitForSeconds(0.33f) },
+                { 0.5f, new WaitForSeconds(0.5f) },
+                { 1, new WaitForSeconds(1) },
+                { 2, new WaitForSeconds(2) },
+                { 3, new WaitForSeconds(3) },
+                { 4, new WaitForSeconds(4) },
+                { 5, new WaitForSeconds(5) },
+                { 10, new WaitForSeconds(10) },
+                { 15, new WaitForSeconds(15) },
+                { 20, new WaitForSeconds(20) },
+                { 25, new WaitForSeconds(25) },
+                { 30, new WaitForSeconds(30) },
+                { 60, new WaitForSeconds(60) },
+                { 100, new WaitForSeconds(100) },
+                { 120, new WaitForSeconds(120) }
+            };
+           
+           for (int i = 0; i < 10; i++)
+           {
+               var firstWaitTime = 0.2f * (float) Math.Pow(2.0, i);
+               var secondWaitTime = 0.5f * (float) Math.Pow(2.0, i);
+               
+               cache.TryAdd(firstWaitTime, new WaitForSeconds(firstWaitTime));
+               cache.TryAdd(secondWaitTime, new WaitForSeconds(secondWaitTime));
+           }
+
+           return cache;
+        }
         
         public static WaitForSeconds GetWaitForSecondsApplicationFrameRate() => GetWaitForSecondsFrame(Application.targetFrameRate);
         
