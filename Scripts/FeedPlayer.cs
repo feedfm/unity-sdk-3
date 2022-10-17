@@ -77,7 +77,7 @@ namespace FeedFM
         }
 
         public Play CurrentPlay => _mixingAudioPlayer.CurrentPlay;
-        private PlayerState _state;
+        [SerializeField, ReadOnly] private PlayerState _state;
         public PlayerState PlayState
         {
             get => _state;
