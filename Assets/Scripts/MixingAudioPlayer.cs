@@ -25,7 +25,7 @@ namespace FeedFM
 
         [SerializeField, ReadOnly] private float _currentPlayTime;
         [SerializeField, ReadOnly] private float _currentPlayDuration;
-        private PlayerState _state;
+        [SerializeField, ReadOnly] private PlayerState _state;
         private readonly IEnumerator[] _faders = new IEnumerator[2];
         private int _activeAudioSourceIndex = 0;
         private const int VOLUME_STEPS_PER_SECOND = 60;
