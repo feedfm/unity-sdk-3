@@ -40,7 +40,9 @@ namespace FeedFM.Demos.Dancing_Bot.Scripts
 				}
 				else
 				{
+#if UNITY_EDITOR
 					Debug.Log(errMessage);
+#endif
 				}
 			};
 
@@ -108,9 +110,7 @@ namespace FeedFM.Demos.Dancing_Bot.Scripts
 					var play = audioPlayer.CurrentPlay;
 			
 					if (play != null) {
-						GUILayout.Label(play.AudioFile.TrackTitle + " by " +
-						                play.AudioFile.ArtistTitle + " on " +
-						                play.AudioFile.ReleaseTitle);			}
+						GUILayout.Label(string.Format("{0} by {1} on {2}", play.AudioFile.TrackTitle, play.AudioFile.ArtistTitle, play.AudioFile.ReleaseTitle));			}
 			
 					GUILayout.BeginHorizontal ();
 			
