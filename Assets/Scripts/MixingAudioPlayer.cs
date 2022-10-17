@@ -23,6 +23,8 @@ namespace FeedFM
 
         #endregion
 
+        [SerializeField, ReadOnly] private float _currentPlayTime;
+        [SerializeField, ReadOnly] private float _currentPlayDuration;
         private PlayerState _state;
         private readonly IEnumerator[] _faders = new IEnumerator[2];
         private int _activeAudioSourceIndex = 0;
@@ -50,9 +52,9 @@ namespace FeedFM
         }
     
         public float FadeDuration = 4.0f;
-        public float CurrentPlayTime;
+        public float CurrentPlayTime => _currentPlayTime;
         public Play CurrentPlay => _currentAsset?.play;
-        public float CurrentPlayDuration;
+        public float CurrentPlayDuration => _currentPlayDuration;
 
         public float Volume
         {
@@ -274,7 +276,7 @@ namespace FeedFM
 
                 if (ActiveAudioSource.isPlaying)
                 {
-                    CurrentPlayTime = ActiveAudioSource.time;
+                    _currentPlayTime = ActiveAudioSource.time;
                 
                     OnProgressUpdate?.Invoke(CurrentPlay, ActiveAudioSource.time, CurrentPlayDuration);
                 }
@@ -415,7 +417,7 @@ namespace FeedFM
         
             _currentAsset = asset;
             _nextAsset = null;
-            CurrentPlayDuration = _currentAsset.clip.length;
+            _currentPlayDuration = _currentAsset.clip.length;
 
             //Fade-in the new clip
             int nextPlayer = (_activeAudioSourceIndex + 1) % _audioSources.Length;
@@ -474,12 +476,13 @@ namespace FeedFM
             int steps = (int)(VOLUME_STEPS_PER_SECOND * duration);
             float stepTime = duration / steps;
             float stepSize = (targetVolume - player.volume) / steps;
+            var localWaitForSecondsCache = new WaitForSeconds(stepTime);
 
             //Fade now
             for (int i = 0; i < steps; i++)
             {
                 player.volume += stepSize;
-                yield return new WaitForSeconds(stepTime);
+                yield return localWaitForSecondsCache;
             }
             
             //Make sure the targetVolume is set

@@ -409,7 +409,7 @@ namespace FeedFM
 
                 retryCount++;
 
-                yield return new WaitForSeconds(0.2f * (float) Math.Pow(2.0, retryCount));
+                yield return WaitForSecondsLibrary.GetWaitForSeconds(0.2f * (float) Math.Pow(2.0, retryCount));
             }
         }
 
@@ -492,7 +492,7 @@ namespace FeedFM
                             _pendingRequest.retryCount++;
 
                             // wait for an increasingly long time before retrying
-                            yield return new WaitForSeconds(0.5f * (float) Math.Pow(2.0, _pendingRequest.retryCount));
+                            yield return WaitForSecondsLibrary.GetWaitForSeconds(0.5f * (float) Math.Pow(2.0, _pendingRequest.retryCount));
                             break;
                         }
                     }
