@@ -3,6 +3,7 @@ using FeedFM.Models;
 using TMPro;
 using UnityEngine;
 using UnityEngine.UI;
+using Logger = FeedFM.Utilities.Logger;
 
 namespace FeedFM.Demos.Dancing_Bot.Scripts
 {
@@ -12,7 +13,7 @@ namespace FeedFM.Demos.Dancing_Bot.Scripts
         [SerializeField] public Animator _animator = null;
         [SerializeField] private TextMeshProUGUI _playPauseLabel = null;
         [SerializeField] private Button _skipButton = null;
-        
+
 
         private void Awake()
         {
@@ -53,7 +54,10 @@ namespace FeedFM.Demos.Dancing_Bot.Scripts
                     break;
                 default:
                 {
-                    Debug.LogErrorFormat("Unknown state: {0}", _feedPlayer.PlayState);
+                    if (Logger.IsLogging)
+                    {
+                        Debug.LogErrorFormat("Unknown state: {0}", _feedPlayer.PlayState);
+                    }
                     break;
                 }
             }
@@ -61,7 +65,10 @@ namespace FeedFM.Demos.Dancing_Bot.Scripts
 
         public void PlayPauseTapped()
         {
-            Debug.LogErrorFormat("PlayPauseTapped state: {0}", _feedPlayer.PlayState);
+            if (Logger.IsLogging)
+            {
+                Debug.LogErrorFormat("PlayPauseTapped state: {0}", _feedPlayer.PlayState);
+            }
             switch (_feedPlayer.PlayState)
             {
                 case PlayerState.Uninitialized:
@@ -85,7 +92,10 @@ namespace FeedFM.Demos.Dancing_Bot.Scripts
                     break;
                 default:
                 {
-                    Debug.LogErrorFormat("Unknown state: {0}", _feedPlayer.PlayState);
+                    if (Logger.IsLogging)
+                    {
+                        Debug.LogErrorFormat("Unknown state: {0}", _feedPlayer.PlayState);
+                    }
                     break;
                 }
             }
@@ -93,7 +103,10 @@ namespace FeedFM.Demos.Dancing_Bot.Scripts
 
         public void SkipTapped()
         {
-            Debug.LogErrorFormat("SkipTapped state: {0}", _feedPlayer.PlayState);
+            if (Logger.IsLogging)
+            {
+                Debug.LogErrorFormat("SkipTapped state: {0}", _feedPlayer.PlayState);
+            }
             
             switch (_feedPlayer.PlayState)
             {
@@ -118,7 +131,10 @@ namespace FeedFM.Demos.Dancing_Bot.Scripts
                     break;
                 default:
                 {
-                    Debug.LogErrorFormat("Unknown state: {0}", _feedPlayer.PlayState);
+                    if (Logger.IsLogging)
+                    {
+                        Debug.LogErrorFormat("Unknown state: {0}", _feedPlayer.PlayState);
+                    }
                     break;
                 }
             }

@@ -1026,7 +1026,7 @@ MonoBehaviour:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1192658169}
-  m_Enabled: 1
+  m_Enabled: 0
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 393df52e7020429387d27bae47edb04b, type: 3}
   m_Name: 
@@ -1811,8 +1811,8 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   _maxNumberOfRetries: 3
-  token: 
-  secret: 
+  _token: 
+  _secret: 
 --- !u!114 &1504221715
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -1827,6 +1827,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   _currentPlayTime: 0
   _currentPlayDuration: 0
+  _state: 0
   FadeDuration: 4
 --- !u!114 &1504221716
 MonoBehaviour:
@@ -1844,6 +1845,8 @@ MonoBehaviour:
   _session: {fileID: 1504221714}
   _token: 69b30ca4c084065fe48ad5b9d5f26046dc12c327
   _secret: a4ac0bba1debed0d05dba8e7ddd8b086b92878a8
+  _loggingModeMode: 1
+  _state: 0
 --- !u!1 &1792874342
 GameObject:
   m_ObjectHideFlags: 0

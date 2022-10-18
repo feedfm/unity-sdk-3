@@ -26,7 +26,7 @@ namespace FeedFM.Utilities
 	 * Request parameters
 	 */
 
-      public enum RequestType {GET, POST};
+      public enum RequestType { GET, POST };
 
       public string url
       {
@@ -42,10 +42,8 @@ namespace FeedFM.Utilities
 
       private Dictionary <string, string> fields	= new Dictionary <string, string>();
       private Dictionary <string, string> headers	= new Dictionary <string, string>();
-
-      // private UnityWebRequest request;
-   
-
+      
+      
       /*
 	 * Response data
 	 */
@@ -114,9 +112,7 @@ namespace FeedFM.Utilities
                   }
                }
 
-               //setRequestHeader("Content-Type", "application/x-www-form-urlencoded");
                request = UnityWebRequest.Post(url, form);
-               //request.SetRequestHeader("content-type", "multipart/form-data;");
                request.SetRequestHeader("Content-Type", "application/x-www-form-urlencoded");
                foreach (KeyValuePair<string, string> kp in headers)
                {
@@ -151,7 +147,6 @@ namespace FeedFM.Utilities
 #if !UNITY_PS4 || UNITY_EDITOR
             else if (request.result == UnityWebRequest.Result.ConnectionError)
             {
-               //Debug.Log(request.error);
                success = false;
                error = 500;
                errorMessage = _requestDownloadHandlerText;
@@ -199,13 +194,14 @@ namespace FeedFM.Utilities
 
       public void DebugResponse()
       {
-#if UNITY_EDITOR
-         if (success) {
-            Debug.Log(string.Format("Request:{0}\n" + "Response: {1}", url, _requestDownloadHandlerText));
-         } else {
-            Debug.Log(string.Format("Request:{0}\n" + "Error id {1}, Response: {2}", url, error, _requestDownloadHandlerText));
+         if (Logger.IsLogging)
+         {
+            if (success) {
+               Debug.Log(string.Format("Request:{0}\n" + "Response: {1}", url, _requestDownloadHandlerText));
+            } else {
+               Debug.Log(string.Format("Request:{0}\n" + "Error id {1}, Response: {2}", url, error, _requestDownloadHandlerText));
+            }
          }
-#endif
       }
    }
 }
