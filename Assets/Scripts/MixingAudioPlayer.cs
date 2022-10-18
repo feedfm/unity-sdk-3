@@ -6,6 +6,7 @@ using FeedFM.Models;
 using FeedFM.Utilities;
 using UnityEngine;
 using UnityEngine.Networking;
+using Logger = FeedFM.Utilities.Logger;
 
 namespace FeedFM
 {
@@ -113,9 +114,10 @@ namespace FeedFM
         
         public void AddAudioAsset(Play play)
         {
-#if UNITY_EDITOR
-            Debug.LogFormat("Add Asset {0}", play.AudioFile.TrackTitle);
-#endif
+            if (Logger.IsLogging)
+            {
+                Debug.LogFormat("Add Asset {0}", play.AudioFile.TrackTitle);
+            }
             _audioFileList.Enqueue(play);
 
             if (_nextAsset == null)
@@ -221,9 +223,10 @@ namespace FeedFM
 
         public void FlushAndIncludeCurrent()
         {
-#if UNITY_EDITOR
-            Debug.LogFormat("Flushing");
-#endif
+            if (Logger.IsLogging)
+            {
+                Debug.LogFormat("Flushing");
+            }
             if(State == PlayerState.Playing)
             {
                 OnPlayCompleted?.Invoke(_currentAsset.play);
@@ -331,9 +334,10 @@ namespace FeedFM
                 }
                 catch (Exception e)
                 {
-#if UNITY_EDITOR
-                    Debug.LogErrorFormat("{0}", e.Message);
-#endif
+                    if (Logger.IsLogging)
+                    {
+                        Debug.LogErrorFormat("{0}", e.Message);
+                    }
                     if (!e.Message.Equals("Cannot access the .audioClip property of an aborted DownloadHandlerAudioClip"))
                     {
                         OnPlayFailed?.Invoke(audioTrack);

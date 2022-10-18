@@ -4,6 +4,7 @@ using FeedFM.Attributes;
 using FeedFM.Models;
 using FeedFM.Utilities;
 using UnityEngine;
+using Logger = FeedFM.Utilities.Logger;
 
 /*
 *	Feed Media client that retrieves music from the Feed.fm servers and plays them on the local
@@ -57,9 +58,10 @@ namespace FeedFM
         
         [SerializeField, ReadOnly] private MixingAudioPlayer _mixingAudioPlayer = null;
         [SerializeField, ReadOnly] private Session _session = null;
-        [SerializeField] private string _token = string.Empty;
-        [SerializeField] private string _secret = string.Empty;
-        
+        [SerializeField, ReadOnlyDuringPlay] private string _token = string.Empty;
+        [SerializeField, ReadOnlyDuringPlay] private string _secret = string.Empty;
+        [SerializeField, ReadOnlyDuringPlay] private LoggingMode _loggingModeMode = LoggingMode.EditorOnly;
+
         public List<Station> Stations => _session.stations;
 
         public float Volume
@@ -95,16 +97,40 @@ namespace FeedFM
         
         private void Awake()
         {
+            SetupLogging();
             InitializeRequiredComponents();
             SetupSession();
             SetupMixingAudioPlayer();
             FetchSession();
         }
 
+        private void SetupLogging()
+        {
+            Logger.IsLogging = false;
+            
+            switch (_loggingModeMode)
+            {
+                case LoggingMode.None:
+                    break;
+                case LoggingMode.EditorOnly:
+#if UNITY_EDITOR
+                    Logger.IsLogging = true;
+#endif
+                    break;
+                case LoggingMode.Always:
+                    Logger.IsLogging = true;
+                    break;
+                default:
+#if UNITY_EDITOR
+                    Debug.LogErrorFormat("Unknown case: {0}", _loggingModeMode);
+#endif
+                    break;
+            }
+        }
+
         private void SetupSession()
         {
-            _session.token = _token;
-            _session.secret = _secret;
+            _session.Initialize(_token, _secret);
             _session.onNextPlayFetched += HandleOnNextPlayFetched;
             _session.onPlaysExhausted += HandleOnPlaysExhausted;
             _session.onSession += HandleOnSessionAvailabilityChanged;

@@ -99,8 +99,8 @@ namespace FeedFM
 
         #region Configuration
 
-        [SerializeField, ReadOnly] public string token = string.Empty;
-        [SerializeField, ReadOnly] public string secret = string.Empty;
+        [SerializeField, ReadOnly] private string _token = string.Empty;
+        [SerializeField, ReadOnly] private string _secret = string.Empty;
 
         public Station _activeStation;
 
@@ -158,6 +158,12 @@ namespace FeedFM
             // pessimistically assume we're out of the US
             Available = false;
             ResetClientId();
+        }
+
+        public void Initialize(string token, string secret)
+        {
+            _token = token;
+            _secret = secret;
         }
 
 
@@ -294,7 +300,7 @@ namespace FeedFM
         {
             // add in authentication header
             ajax.addHeader("Authorization",
-                "Basic " + System.Convert.ToBase64String(System.Text.Encoding.UTF8.GetBytes(string.Format("{0}:{1}", token, secret))));
+                "Basic " + System.Convert.ToBase64String(System.Text.Encoding.UTF8.GetBytes(string.Format("{0}:{1}", _token, _secret))));
             ajax.addHeader("Cookie", string.Empty);
 
             yield return StartCoroutine(ajax.Request());
