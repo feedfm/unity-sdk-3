@@ -2,7 +2,7 @@
 
 namespace FeedFM.Models
 {
-    internal class AudioFile
+    public class AudioFile
     {
         public string TrackTitle { get; set; }
         public string ReleaseTitle { get; set; }
