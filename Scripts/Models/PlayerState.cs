@@ -1,6 +1,6 @@
 ﻿namespace FeedFM.Models
 {
-    internal enum PlayerState
+    public enum PlayerState
     {
         Uninitialized,
         Unavailable,

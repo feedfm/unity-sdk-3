@@ -42,7 +42,7 @@ namespace FeedFM
     [RequireComponent(typeof(MixingAudioPlayer))]
     [RequireComponent(typeof(Session))]
     [DisallowMultipleComponent]
-    internal sealed class FeedPlayer : MonoBehaviour
+    public sealed class FeedPlayer : MonoBehaviour
     {
         #region Events
 

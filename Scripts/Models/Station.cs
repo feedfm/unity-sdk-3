@@ -5,7 +5,7 @@ using FeedFM.Utilities;
 
 namespace FeedFM.Models
 {
-    internal class Station
+    public class Station
     { 
         public int Id { get; set; }
         public string Name { get; set; }

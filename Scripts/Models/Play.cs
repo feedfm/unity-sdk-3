@@ -2,7 +2,7 @@
 
 namespace FeedFM.Models
 {
-    internal class Play
+    public class Play
     {
         public string Id { get; set; }
         public Station Station { get; set; }
