@@ -13,6 +13,7 @@ namespace FeedFM.Demos.Dancing_Bot.Scripts
         [SerializeField] private StationsView _stationsView = null;
         [SerializeField] public Animator _animator = null;
         [SerializeField] private TextMeshProUGUI _playPauseLabel = null;
+        [SerializeField] private Button _playPauseButton = null;
         [SerializeField] private TextMeshProUGUI _currentTrackNameLabel = null;
         [SerializeField] private TextMeshProUGUI _currentTrackArtistNameLabel = null;
         [SerializeField] private TextMeshProUGUI _currentTrackReleaseTitleLabel = null;
@@ -20,6 +21,10 @@ namespace FeedFM.Demos.Dancing_Bot.Scripts
         [SerializeField] private Button _skipButton = null;
         [SerializeField] private GameObject _noTrackPanel = null;
         [SerializeField] private GameObject _noStationPanel = null;
+        [SerializeField] private Color _playButtonColor = Color.green;
+        [SerializeField] private Color _pauseButtonColor = Color.red;
+        
+        
         
 
         private void Awake()
@@ -76,6 +81,7 @@ namespace FeedFM.Demos.Dancing_Bot.Scripts
                     break;
                 case PlayerState.ReadyToPlay:
                     _playPauseLabel.text = "Play";
+                    _playPauseButton.image.color = _playButtonColor;
                     break;
                 case PlayerState.Stalled:
                     break;
@@ -83,10 +89,12 @@ namespace FeedFM.Demos.Dancing_Bot.Scripts
                     _animator.speed = 1f;
                     _playPauseLabel.text = "Pause";
                     _skipButton.gameObject.SetActive(true);
+                    _playPauseButton.image.color = _pauseButtonColor;
                     break;
                 case PlayerState.Paused:
                     _playPauseLabel.text = "Play";
                     _skipButton.gameObject.SetActive(true);
+                    _playPauseButton.image.color = _playButtonColor;
                     break;
                 case PlayerState.WaitingForItem:
                     break;
