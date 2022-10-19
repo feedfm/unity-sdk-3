@@ -131,9 +131,9 @@ namespace FeedFM
         private void SetupSession()
         {
             _session.Initialize(_token, _secret);
-            _session.onNextPlayFetched += HandleOnNextPlayFetched;
-            _session.onPlaysExhausted += HandleOnPlaysExhausted;
-            _session.onSession += HandleOnSessionAvailabilityChanged;
+            _session.OnNextPlayFetched += HandleOnNextPlayFetched;
+            _session.OnPlaysExhausted += HandleOnPlaysExhausted;
+            _session.OnSession += HandleOnSessionAvailabilityChanged;
             _session.OnSkipRequestCompleted += HandleOnSkipRequestCompleted;
         }
 

@@ -27,6 +27,7 @@ namespace FeedFM
         [SerializeField, ReadOnly] private float _currentPlayTime;
         [SerializeField, ReadOnly] private float _currentPlayDuration;
         [SerializeField, ReadOnly] private PlayerState _state;
+        
         private readonly IEnumerator[] _faders = new IEnumerator[2];
         private int _activeAudioSourceIndex = 0;
         private const int VOLUME_STEPS_PER_SECOND = 60;
@@ -440,6 +441,7 @@ namespace FeedFM
 
             //Register new active player
             _activeAudioSourceIndex = nextPlayer;
+            State = PlayerState.Playing;
         }
 
         private void StopAllFadeCoroutines()
@@ -460,11 +462,6 @@ namespace FeedFM
             // Song completed
             _faders[0] = null;
             StopAndFlushAudioSource(audioSource);
-            // Is the next song playing
-            if (!ActiveAudioSource.isPlaying)
-            {
-                State = PlayerState.WaitingForItem;
-            }
         }
 
         private IEnumerator FadeInAudioSourceNoAlloc(AudioSource audioSource, float duration, float targetVolume)

@@ -90,10 +90,10 @@ namespace FeedFM
         
         #region Events
 
-        public event SessionDelegate onSession; // placement data was retrieved from the server
-        public event PlayDelegate onNextPlayFetched; // a play has become active and is ready to be started
+        public event SessionDelegate OnSession; // placement data was retrieved from the server
+        public event PlayDelegate OnNextPlayFetched; // a play has become active and is ready to be started
         public event SkipDelegate OnSkipRequestCompleted; // request to skip current song denied
-        public event Handler onPlaysExhausted; // the server has no more songs for us in the current station
+        public event Handler OnPlaysExhausted; // the server has no more songs for us in the current station
 
         #endregion
 
@@ -188,11 +188,11 @@ namespace FeedFM
                             Placement = ajax.GetPlacementFromResponse();
 
                             stations = ajax.GetStations();
-                            onSession?.Invoke(true, string.Empty);
+                            OnSession?.Invoke(true, string.Empty);
                             yield break;
                         }
 
-                        onSession?.Invoke(false, ajax.GetSessionMessage());
+                        OnSession?.Invoke(false, ajax.GetSessionMessage());
                     }
 
                     yield break;
@@ -200,7 +200,7 @@ namespace FeedFM
 
                 if (ajax.HasErrorCode(FeedError.InvalidRegion))
                 {
-                    onSession?.Invoke(false, "Invalid region");
+                    OnSession?.Invoke(false, "Invalid region");
                     yield break;
                 }
 
@@ -208,7 +208,7 @@ namespace FeedFM
                 yield return WaitForSecondsLibrary.TwoSeconds;
             }
 
-            onSession?.Invoke(false, "Failed to establish connection");
+            OnSession?.Invoke(false, "Failed to establish connection");
         }
 
         public void RequestNext()
@@ -465,7 +465,7 @@ namespace FeedFM
                 else if (ajax.success)
                 {
                     _pendingRequest = null;
-                    onNextPlayFetched?.Invoke(ajax.GetPlayFromResponseSession());
+                    OnNextPlayFetched?.Invoke(ajax.GetPlayFromResponseSession());
                     yield break;
                 }
                 else
@@ -478,7 +478,7 @@ namespace FeedFM
                             {
                                 // ran out of music, and nothing else to play
                                 exhausted = true;
-                                onPlaysExhausted?.Invoke(this);
+                                OnPlaysExhausted?.Invoke(this);
                             }
 
                             _pendingRequest = null;
@@ -489,7 +489,7 @@ namespace FeedFM
                         {
                             // user isn't in the united states, so can't play anything
                             Available = false;
-                            onSession?.Invoke(false, "Invalid Region");
+                            OnSession?.Invoke(false, "Invalid Region");
                             yield break;
                         }
                         default:
@@ -579,7 +579,7 @@ namespace FeedFM
                 {
                     // user isn't in a valid region, so can't play anything
                     Available = false;
-                    onSession?.Invoke(false, "Invalid Region");
+                    OnSession?.Invoke(false, "Invalid Region");
                     yield break;
                 }
 
@@ -630,7 +630,7 @@ namespace FeedFM
             {
                 // user isn't in a valid region, so can't play anything
                 Available = false;
-                onSession?.Invoke(false, "Invalid Region");
+                OnSession?.Invoke(false, "Invalid Region");
                 yield break;
             }
         }
