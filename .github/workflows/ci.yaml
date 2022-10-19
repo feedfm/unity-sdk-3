@@ -2,7 +2,7 @@ name: CI
 on:
   push:
     branches:
-    - feature/upm-pipeline
+    - development
 jobs:
   release:
     name: release
@@ -26,6 +26,47 @@ jobs:
         git branch -d upm &> /dev/null || echo upm branch not found
         git subtree split -P "$PKG_ROOT" -b upm
         git checkout upm
+        
+        if [[ -d "Scripts" ]]; then
+          git mv Scripts Scripts~
+          rm -f Scripts.meta
+          git config --global user.name 'github-bot'
+          git config --global user.email 'github-bot@users.noreply.github.com'
+          git commit -am "fix: Scripts => Scripts~"
+        fi 
+        
+        if [[ -d "Scenes" ]]; then
+          rm -rf Scenes
+          rm -f Scenes.meta
+          git config --global user.name 'github-bot'
+          git config --global user.email 'github-bot@users.noreply.github.com'
+          git commit -am "fix: Remove Scenes"
+        fi 
+        
+        if [[ -d "TextMesh Pro" ]]; then
+          rm -rf "TextMesh Pro"
+          rm -f "TextMesh Pro.meta"
+          git config --global user.name 'github-bot'
+          git config --global user.email 'github-bot@users.noreply.github.com'
+          git commit -am "fix: Remove TMPro"
+        fi
+
+         if [[ -d "Demos" ]]; then
+          rm -rf Demos
+          rm -f "Demos.meta"
+          git config --global user.name 'github-bot'
+          git config --global user.email 'github-bot@users.noreply.github.com'
+          git commit -am "fix: Remove Demos"
+        fi
+
+        if [[ -d "Legacy" ]]; then
+          rm -rf Legacy
+          rm -f "Legacy.meta"
+          git config --global user.name 'github-bot'
+          git config --global user.email 'github-bot@users.noreply.github.com'
+          git commit -am "fix: Remove Legacy"
+        fi
+
         if [[ -d "Samples" ]]; then
           git mv Samples Samples~
           rm -f Samples.meta
@@ -33,9 +74,10 @@ jobs:
           git config --global user.email 'github-bot@users.noreply.github.com'
           git commit -am "fix: Samples => Samples~"
         fi
+
         git push -f -u origin upm
       env:
-        PKG_ROOT: Assets/Legacy
+        PKG_ROOT: Assets
     - name: Create upm git tag
       if: steps.semantic.outputs.new_release_published == 'true'
       run: |
