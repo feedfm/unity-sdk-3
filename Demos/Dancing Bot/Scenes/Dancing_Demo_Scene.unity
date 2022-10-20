@@ -525,7 +525,7 @@ MonoBehaviour:
   m_faceColor:
     serializedVersion: 2
     rgba: 4294967295
-  m_fontSize: 140
+  m_fontSize: 135.85
   m_fontSizeBase: 36
   m_fontWeight: 400
   m_enableAutoSizing: 1
@@ -2276,7 +2276,7 @@ MonoBehaviour:
   m_faceColor:
     serializedVersion: 2
     rgba: 4294967295
-  m_fontSize: 140
+  m_fontSize: 135.85
   m_fontSizeBase: 36
   m_fontWeight: 400
   m_enableAutoSizing: 1
@@ -4344,8 +4344,8 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   _mixingAudioPlayer: {fileID: 1504221715}
   _session: {fileID: 1504221714}
-  _token: 69b30ca4c084065fe48ad5b9d5f26046dc12c327
-  _secret: a4ac0bba1debed0d05dba8e7ddd8b086b92878a8
+  _token: demo
+  _secret: demo
   _loggingMode: 1
   _state: 0
 --- !u!1 &1505421020
@@ -4795,7 +4795,7 @@ MonoBehaviour:
   m_faceColor:
     serializedVersion: 2
     rgba: 4294967295
-  m_fontSize: 72
+  m_fontSize: 52.1
   m_fontSizeBase: 36
   m_fontWeight: 400
   m_enableAutoSizing: 1
@@ -5011,7 +5011,7 @@ RectTransform:
   m_AnchorMin: {x: 0, y: 0}
   m_AnchorMax: {x: 0, y: 0}
   m_AnchoredPosition: {x: 0, y: 0}
-  m_SizeDelta: {x: 800, y: 300}
+  m_SizeDelta: {x: 700, y: 250}
   m_Pivot: {x: 0, y: 0}
 --- !u!114 &1950091790
 MonoBehaviour:
