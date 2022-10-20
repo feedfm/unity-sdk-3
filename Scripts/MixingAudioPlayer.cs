@@ -186,8 +186,11 @@ namespace FeedFM
     
         public void Pause()
         {
+            foreach (var audioSource in _audioSources)
+            {
+                audioSource.Pause();
+            }
             _playWhenReady = false;
-            ActiveAudioSource.Pause();
             State = PlayerState.Paused;
             _bUpdate = false;
         }
