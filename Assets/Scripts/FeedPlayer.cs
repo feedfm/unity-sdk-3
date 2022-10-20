@@ -60,7 +60,7 @@ namespace FeedFM
         [SerializeField, ReadOnly] private Session _session = null;
         [SerializeField, ReadOnlyDuringPlay] private string _token = string.Empty;
         [SerializeField, ReadOnlyDuringPlay] private string _secret = string.Empty;
-        [SerializeField, ReadOnlyDuringPlay] private LoggingMode _loggingModeMode = LoggingMode.EditorOnly;
+        [SerializeField, ReadOnlyDuringPlay] private LoggingMode _loggingMode = LoggingMode.EditorOnly;
 
         public List<Station> Stations => _session.stations;
 
@@ -108,7 +108,7 @@ namespace FeedFM
         {
             Logger.IsLogging = false;
             
-            switch (_loggingModeMode)
+            switch (_loggingMode)
             {
                 case LoggingMode.None:
                     break;
@@ -122,7 +122,7 @@ namespace FeedFM
                     break;
                 default:
 #if UNITY_EDITOR
-                    Debug.LogErrorFormat("Unknown case: {0}", _loggingModeMode);
+                    Debug.LogErrorFormat("Unknown case: {0}", _loggingMode);
 #endif
                     break;
             }
