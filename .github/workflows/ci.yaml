@@ -19,9 +19,8 @@ jobs:
           @semantic-release/changelog 
           @semantic-release/git
           @iam1337/create-unitypackage
-          "@semantic-release/npm", {
+          ["@semantic-release/npm", {
             "npmPublish": false,
-            "tarballDir": "dist",
           }]
         branch: main
       env:
