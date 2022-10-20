@@ -19,7 +19,7 @@ jobs:
           @semantic-release/changelog 
           @semantic-release/git
           @iam1337/create-unitypackage
-        branch: main
+        branch: development
       env:
         NPM_TOKEN: fake-token-value
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
