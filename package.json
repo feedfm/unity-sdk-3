@@ -11,6 +11,14 @@
     "url": "git+https://github.com/feedfm/unity-sdk-3.git"
   },
   "author": "FeedFM",
+  "plugins": [
+    "@semantic-release/changelog", 
+    "@semantic-release/git",
+    "@iam1337/create-unitypackage",
+    ["@semantic-release/npm", {
+      "npmPublish": false
+    }]
+  ],
   "bugs": {
     "url": "https://github.com/feedfm/unity-sdk-3/issues"
   },
