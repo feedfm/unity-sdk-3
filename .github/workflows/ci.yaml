@@ -16,10 +16,12 @@ jobs:
       uses: cycjimmy/semantic-release-action@v2
       with:
         extra_plugins: |
-          @semantic-release/changelog
+          @semantic-release/changelog 
           @semantic-release/git
-        branch: main
+          @iam1337/create-unitypackage
+        branch: development
       env:
+        NPM_TOKEN: fake-token-value
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
     - name: Create upm branch
       run: |
