@@ -15,13 +15,6 @@ jobs:
       id: semantic
       uses: cycjimmy/semantic-release-action@v2
       with:
-        extra_plugins: |
-          @semantic-release/changelog 
-          @semantic-release/git
-          @iam1337/create-unitypackage
-          ["@semantic-release/npm", {
-            "npmPublish": false,
-          }]
         branch: main
       env:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
