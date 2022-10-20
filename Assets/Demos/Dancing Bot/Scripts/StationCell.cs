@@ -13,17 +13,12 @@ namespace FeedFM.Demos.Dancing_Bot.Scripts
         [SerializeField] private TextMeshProUGUI _stationName = null;
         [SerializeField] private Button _button = null;
 
-        private void Awake()
-        {
-            _button.onClick.AddListener(Tapped);
-        }
-
         public void Initialize(Station station)
         {
             _stationName.text = station.Name;
         }
 
-        private void Tapped()
+        public void Tapped()
         {
             OnButtonTapped?.Invoke(this);
         }

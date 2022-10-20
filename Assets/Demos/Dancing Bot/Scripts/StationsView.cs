@@ -49,10 +49,5 @@ namespace FeedFM.Demos.Dancing_Bot.Scripts
                 _cells.Add(cell);
             }
         }
-
-        public void Tapped()
-        {
-             
-        }
     }
 }

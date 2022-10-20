@@ -12,20 +12,16 @@ namespace FeedFM.Demos.Dancing_Bot.Scripts
         [SerializeField] FeedPlayer _feedPlayer = null;
         [SerializeField] private StationsView _stationsView = null;
         [SerializeField] public Animator _animator = null;
+        [SerializeField] private AudioTrackView _audioTrackView = null;
         [SerializeField] private TextMeshProUGUI _playPauseLabel = null;
         [SerializeField] private Button _playPauseButton = null;
-        [SerializeField] private TextMeshProUGUI _currentTrackNameLabel = null;
-        [SerializeField] private TextMeshProUGUI _currentTrackArtistNameLabel = null;
-        [SerializeField] private TextMeshProUGUI _currentTrackReleaseTitleLabel = null;
         [SerializeField] private TextMeshProUGUI _currentStationNameLabel = null;
         [SerializeField] private Button _skipButton = null;
         [SerializeField] private GameObject _noTrackPanel = null;
         [SerializeField] private GameObject _noStationPanel = null;
         [SerializeField] private Color _playButtonColor = Color.green;
         [SerializeField] private Color _pauseButtonColor = Color.red;
-        
-        
-        
+
 
         private void Awake()
         {
@@ -116,19 +112,13 @@ namespace FeedFM.Demos.Dancing_Bot.Scripts
             if (_feedPlayer.CurrentPlay is not null)
             {
                 _noTrackPanel.SetActive(false);
-                
-                var play = _feedPlayer.CurrentPlay;
-                _currentTrackNameLabel.text = string.Format("Track: {0}", play.AudioFile.TrackTitle);
-                _currentTrackArtistNameLabel.text = string.Format("Artist: {0}", play.AudioFile.ArtistTitle);
-                _currentTrackReleaseTitleLabel.text = string.Format("Release Title: {0}", play.AudioFile.ReleaseTitle);
+
+                _audioTrackView.Configure(_feedPlayer.CurrentPlay);
             }
             else
             {
                 _noTrackPanel.SetActive(true);
-                
-                _currentTrackNameLabel.text = string.Empty;
-                _currentTrackArtistNameLabel.text = string.Empty;
-                _currentTrackReleaseTitleLabel.text = string.Empty;
+                _audioTrackView.ClearUI();
             }
         }
 
