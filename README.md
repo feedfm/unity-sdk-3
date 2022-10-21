@@ -3,8 +3,8 @@
 
 [![openupm](https://img.shields.io/npm/v/com.feedfm.unity-sdk?label=openupm&registry_uri=https://package.openupm.com)](https://openupm.com/packages/com.feedfm.unity-sdk/)
 
-
 ## UPM Package ##
+
 ---
 
 ### Install via OpenUPM ###
@@ -15,13 +15,53 @@ The package is available on the [openupm registry](https://openupm.com/packages/
 openupm add com.feedfm.unity-sdk
 ```
 
+### Install via Package Manager ###
+
+open Edit/Project Settings/Package Manager
+add a new Scoped Registry (or edit the existing OpenUPM entry)
+
+Name
+    package.openupm.com
+URL
+    <https://package.openupm.com>
+Scope(s)
+    com.feedfm.unity-sdk
+
+click Save (or Apply)
+open Window/Package Manager
+click +
+select Add package by name... or Add package from git URL...
+paste com.feedfm.unity-sdk into name
+paste 0.0.1 into version
+click Add
+
+Alternatively, merge the snippet to Packages/manifest.json
+
+```json
+{
+    "scopedRegistries": [
+        {
+            "name": "package.openupm.com",
+            "url": "https://package.openupm.com",
+            "scopes": [
+                "com.feedfm.unity-sdk"
+            ]
+        }
+    ],
+    "dependencies": {
+        "com.feedfm.unity-sdk": "0.0.1"
+    }
+}
+```
+
+via command-line interface
+openupm add com.feedfm.unity-sdk
 
 ## Getting started ##
 
 To begin playing the music, create a new gameobject and attach the FeedPlayer.cs script to it. Then configure the player by setting token and secret and optional values like crossfade duration etc in the unity editor or by editing the script.
 
 Included PlayerGUI.cs script and PopupPlayerGUI.cs script show how to interact with the player and how to create a GUI for displaying the track metadata and other information.
-
 
 ### Playing music ###
 
