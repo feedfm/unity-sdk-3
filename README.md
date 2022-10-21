@@ -19,14 +19,9 @@ openupm add com.feedfm.unity-sdk
 
 - open Edit/Project Settings/Package Manager
 - add a new Scoped Registry (or edit the existing OpenUPM entry)
-
-Name
-    `package.openupm.com`
-URL
-    <https://package.openupm.com>
-Scope(s)
-    `com.feedfm.unity-sdk`
-
+  - Name: `package.openupm.com`
+  - URL: <https://package.openupm.com>
+  - Scope(s): `com.feedfm.unity-sdk`
 - click **Save** (or **Apply**)
 - open Window/Package Manager
 - click **+**
