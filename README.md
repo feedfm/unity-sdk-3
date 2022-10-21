@@ -3,7 +3,7 @@
 
 [![openupm](https://img.shields.io/npm/v/com.feedfm.unity-sdk?label=openupm&registry_uri=https://package.openupm.com)](https://openupm.com/packages/com.feedfm.unity-sdk/)
 
-## UPM Package ##
+## Install ##
 
 ---
 
@@ -50,6 +50,8 @@ Alternatively, merge the snippet to Packages/manifest.json
 ```
 
 ## Getting started ##
+
+---
 
 To begin playing the music, create a new gameobject and attach the FeedPlayer.cs script to it. Then configure the player by setting token and secret and optional values like crossfade duration etc in the unity editor or by editing the script.
 
