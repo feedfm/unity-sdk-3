@@ -17,23 +17,23 @@ openupm add com.feedfm.unity-sdk
 
 ### Install via Package Manager ###
 
-open Edit/Project Settings/Package Manager
-add a new Scoped Registry (or edit the existing OpenUPM entry)
+- open Edit/Project Settings/Package Manager
+- add a new Scoped Registry (or edit the existing OpenUPM entry)
 
 Name
-    package.openupm.com
+    `package.openupm.com`
 URL
     <https://package.openupm.com>
 Scope(s)
-    com.feedfm.unity-sdk
+    `com.feedfm.unity-sdk`
 
-click Save (or Apply)
-open Window/Package Manager
-click +
-select Add package by name... or Add package from git URL...
-paste com.feedfm.unity-sdk into name
-paste 0.0.1 into version
-click Add
+- click **Save** (or **Apply**)
+- open Window/Package Manager
+- click **+**
+- select **Add package by name..**. or **Add package from git URL...**
+- paste `com.feedfm.unity-sdk into name`
+- paste `0.0.1` into version
+- click **Add**
 
 Alternatively, merge the snippet to Packages/manifest.json
 
@@ -53,9 +53,6 @@ Alternatively, merge the snippet to Packages/manifest.json
     }
 }
 ```
-
-via command-line interface
-openupm add com.feedfm.unity-sdk
 
 ## Getting started ##
 
