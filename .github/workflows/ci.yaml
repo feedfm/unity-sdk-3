@@ -20,7 +20,7 @@ jobs:
         branches: development
         semantic_version: 19.0.5
       env:
-        NPM_TOKEN: fake-token-value
+        NPM_TOKEN: ${{ secrets.NPM_TOKEN }}
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
     - name: Create upm branch
       run: |
