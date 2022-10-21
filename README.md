@@ -1,22 +1,25 @@
 
-## FeedFM Unity SDK ##
+# FeedFM Unity SDK #
 
-#### Getting started ####
 
-To begin playing the music, create a new gameobject and attach the FeedPlayer.cs script to it. Then configure the player by setting token and secret and optional values like crossfade duration etc in the unity editor or by editing the script.
-
-Included PlayerGUI.cs script and PopupPlayerGUI.cs script show how to interact with the player and how to create a GUI for displaying the track metadata and other information.
-
-UPM Package
+## UPM Package ##
 ---
 
-### Install via OpenUPM
+### Install via OpenUPM ###
 
 The package is available on the [openupm registry](https://openupm.com). It's recommended to install it via [openupm-cli](https://github.com/openupm/openupm-cli).
 
 ```
 openupm add com.feedfm.unity-sdk
 ```
+
+
+## Getting started ##
+
+To begin playing the music, create a new gameobject and attach the FeedPlayer.cs script to it. Then configure the player by setting token and secret and optional values like crossfade duration etc in the unity editor or by editing the script.
+
+Included PlayerGUI.cs script and PopupPlayerGUI.cs script show how to interact with the player and how to create a GUI for displaying the track metadata and other information.
+
 
 ### Playing music ###
 
