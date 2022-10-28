@@ -281,7 +281,7 @@ namespace FeedFM
                     State = PlayerState.Playing;
                 }
 
-                if (ActiveAudioSource.isPlaying)
+                if (State == PlayerState.Playing)
                 {
                     _currentPlayTime = ActiveAudioSource.time;
                 
@@ -308,7 +308,7 @@ namespace FeedFM
                     }
                 }
 
-                yield return WaitForSecondsLibrary.HalfOfASecond;
+                yield return null;
             }
        
         }
