@@ -3,6 +3,7 @@ using UnityEngine;
 
 namespace FeedFM.Attributes.Editor
 {
+#if UNITY_EDITOR
     [CustomPropertyDrawer(typeof(ReadOnlyAttribute))]
     public class ReadOnlyDrawer : PropertyDrawer
     {
@@ -18,4 +19,5 @@ namespace FeedFM.Attributes.Editor
             GUI.enabled = true;
         }
     }
+#endif
 }
