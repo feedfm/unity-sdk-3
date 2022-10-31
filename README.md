@@ -51,6 +51,9 @@ Alternatively, merge the snippet to Packages/manifest.json
 
 ## Getting started ##
 
+---
+
+
 To begin playing the music, create a new GameObject and attach the FeedPlayer.cs script to it. Then configure the player by setting token and secret and optional values like crossfade duration etc in the unity editor or by editing the script.
 
 ### Example Usage
@@ -86,12 +89,12 @@ private void Awake()
 
 ```C#
     
-_feedPlayer.OnStationChanged += ( station) =>
+_feedPlayer.OnStationChanged += station =>
 {
     Debug.Log(string.Format("New station {0} is set", station.Name));
 };
 
-_feedPlayer.OnPlayStarted += ( play) =>
+_feedPlayer.OnPlayStarted += play =>
 {
     Debug.Log("play started "+play.AudioFile.TrackTitle);
 };
