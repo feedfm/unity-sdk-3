@@ -1,6 +1,6 @@
 {
   "name": "com.feedfm.unity-sdk",
-  "version": "0.0.3",
+  "version": "0.0.4",
   "displayName": "FeedFM Unity SDK",
   "unity": "2018.4",
   "description": "The unity sdk for https://www.feed.fm",
@@ -8,7 +8,8 @@
   "category": "SDK",
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/feedfm/unity-sdk-3.git"
+    "url": "git+https://github.com/feedfm/unity-sdk-3.git",
+    "readme": "https://github.com/feedfm/unity-sdk-3#readme"
   },
   "author": "FeedFM",
   "bugs": {
