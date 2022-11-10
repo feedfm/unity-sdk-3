@@ -157,7 +157,7 @@ namespace FeedFM
             _pendingSessionRequest = new PendingRequest();
             // pessimistically assume we're out of the US
             Available = false;
-            ResetClientId();
+            LoadClientId();
         }
 
         public void Initialize(string token, string secret)
@@ -539,7 +539,7 @@ namespace FeedFM
         /// <summary>
         /// Ensure we've got a clientId
         /// </summary>
-        private IEnumerator EnsureClientId()
+        private IEnumerator LoadClientId()
         {
             if (_baseClientId != null)
             {
@@ -552,40 +552,7 @@ namespace FeedFM
                 _baseClientId = PlayerPrefs.GetString("feedfm.client_id");
                 yield break;
             }
-            // need to get an id
-
-            while (true)
-            {
-                Ajax ajax = new Ajax(Ajax.RequestType.POST, API_SERVER_BASE + "/client");
-
-                yield return StartCoroutine(SignedRequest(ajax));
-
-                if (ajax.success)
-                {
-                    _baseClientId = ajax.GetClientIDFromResponseSession();
-
-                    try
-                    {
-                        PlayerPrefs.SetString("feedfm.client_id", _baseClientId);
-                    }
-                    catch (PlayerPrefsException)
-                    {
-                        // ignore, 
-                    }
-
-                    yield break;
-                }
-                else if (ajax.HasErrorCode(FeedError.InvalidRegion))
-                {
-                    // user isn't in a valid region, so can't play anything
-                    Available = false;
-                    OnSession?.Invoke(false, "Invalid Region");
-                    yield break;
-                }
-
-                // no success, so wait bit and then try again
-                yield return WaitForSecondsLibrary.OneSecond;
-            }
+            
         }
 
         public bool MaybeCanSkip()
