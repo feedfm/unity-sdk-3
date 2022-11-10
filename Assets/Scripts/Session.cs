@@ -170,6 +170,10 @@ namespace FeedFM
         public IEnumerator FetchSession()
         {
             Ajax ajax = new Ajax(Ajax.RequestType.POST, API_SERVER_BASE + "/session");
+            if (_baseClientId != null)
+            {
+                ajax.addParameter("client_id", _baseClientId);
+            }
 
             while (_pendingSessionRequest.retryCount < _maxNumberOfRetries)
             {
@@ -204,7 +208,7 @@ namespace FeedFM
                     yield break;
                 }
 
-                _lastStatus.retryCount++;
+                _pendingSessionRequest.retryCount++;
                 yield return WaitForSecondsLibrary.TwoSeconds;
             }
 
@@ -299,6 +303,7 @@ namespace FeedFM
         private IEnumerator SignedRequest(Ajax ajax)
         {
             // add in authentication header
+            
             ajax.addHeader("Authorization",
                 "Basic " + System.Convert.ToBase64String(System.Text.Encoding.UTF8.GetBytes(string.Format("{0}:{1}", _token, _secret))));
             ajax.addHeader("Cookie", string.Empty);
@@ -539,18 +544,17 @@ namespace FeedFM
         /// <summary>
         /// Ensure we've got a clientId
         /// </summary>
-        private IEnumerator LoadClientId()
+        private void LoadClientId()
         {
             if (_baseClientId != null)
             {
-                yield break;
+                return;
             }
 
             if (PlayerPrefs.HasKey("feedfm.client_id"))
             {
                 // have one already, so use it
                 _baseClientId = PlayerPrefs.GetString("feedfm.client_id");
-                yield break;
             }
             
         }

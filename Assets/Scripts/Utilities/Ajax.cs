@@ -80,13 +80,19 @@ namespace FeedFM.Utilities
 
       public Ajax addParameter(string name, string value)
       {
-         fields.Add(name, value);
+         if (!fields.ContainsKey(name))
+         {
+            fields.Add(name, value);
+         }
          return this;
       }
 
       public void addHeader(string name, string value)
       {
-         headers.Add(name, value);
+         if (!headers.ContainsKey(name))
+         {
+            headers.Add(name, value);
+         }
       }
 
       public IEnumerator Request()
@@ -95,7 +101,10 @@ namespace FeedFM.Utilities
          
          try
          {
-            fields.Add("force200", "1");
+            if (!fields.ContainsKey("force200"))
+            {
+               fields.Add("force200", "1");
+            }
 
             if (type == RequestType.POST)
             {
