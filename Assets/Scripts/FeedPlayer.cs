@@ -42,7 +42,7 @@ namespace FeedFM
     [RequireComponent(typeof(MixingAudioPlayer))]
     [RequireComponent(typeof(Session))]
     [DisallowMultipleComponent]
-    public sealed class FeedPlayer : MonoBehaviour
+    public class FeedPlayer : MonoBehaviour
     {
         #region Events
 
@@ -56,7 +56,7 @@ namespace FeedFM
 
         #endregion
         
-        [SerializeField, ReadOnly] private MixingAudioPlayer _mixingAudioPlayer = null;
+        [SerializeField, ReadOnly] public MixingAudioPlayer _mixingAudioPlayer = null;
         [SerializeField, ReadOnly] private Session _session = null;
         [SerializeField, ReadOnlyDuringPlay] private string _token = string.Empty;
         [SerializeField, ReadOnlyDuringPlay] private string _secret = string.Empty;

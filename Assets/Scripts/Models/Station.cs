@@ -33,7 +33,7 @@ namespace FeedFM.Models
             station.PreGain = jStation["pre_gain"].AsFloat;
             station.IsSinglePlay = jStation["single_play"].AsBool;
             station.IsOnDemand = jStation["on_demand"].AsBool;
-            station.IsTypeOffline = jStation["on_demand"].AsBool;
+            station.IsTypeOffline = false;
 
             if (jStation["last_updated"].Value.Length != 0) {
                 station.LastUpdated = DateTime.Parse(jStation["last_updated"].Value);

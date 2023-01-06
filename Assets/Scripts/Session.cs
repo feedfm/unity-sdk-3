@@ -84,8 +84,8 @@ namespace FeedFM
 */
     
     [DisallowMultipleComponent]
-    internal sealed class Session : MonoBehaviour
-    {
+    public sealed class Session : MonoBehaviour
+    {   
         [SerializeField] private int _maxNumberOfRetries = 3;
         
         #region Events
@@ -123,15 +123,13 @@ namespace FeedFM
         private PendingRequest _pendingRequest;
         private PendingRequest _pendingSessionRequest;
         public const string EXPORT_CLIENT_ID_PREFIX = "fmcidv1:";
-        private string _fullClientId = string.Empty;
 
         public string ClientId
         {
-            get => _fullClientId;
+            get => $"{EXPORT_CLIENT_ID_PREFIX}{_baseClientId}";
             set
             {
                 _baseClientId = value.Substring(EXPORT_CLIENT_ID_PREFIX.Length);
-                _fullClientId = string.Format("{0}{1}", EXPORT_CLIENT_ID_PREFIX, _baseClientId);
                 PlayerPrefs.SetString("feedfm.client_id", _baseClientId);
             }
         }
@@ -157,7 +155,7 @@ namespace FeedFM
             _pendingSessionRequest = new PendingRequest();
             // pessimistically assume we're out of the US
             Available = false;
-            ResetClientId();
+            LoadClientId();
         }
 
         public void Initialize(string token, string secret)
@@ -170,6 +168,10 @@ namespace FeedFM
         public IEnumerator FetchSession()
         {
             Ajax ajax = new Ajax(Ajax.RequestType.POST, API_SERVER_BASE + "/session");
+            if (_baseClientId != null)
+            {
+                ajax.addParameter("client_id", _baseClientId);
+            }
 
             while (_pendingSessionRequest.retryCount < _maxNumberOfRetries)
             {
@@ -204,7 +206,7 @@ namespace FeedFM
                     yield break;
                 }
 
-                _lastStatus.retryCount++;
+                _pendingSessionRequest.retryCount++;
                 yield return WaitForSecondsLibrary.TwoSeconds;
             }
 
@@ -299,6 +301,7 @@ namespace FeedFM
         private IEnumerator SignedRequest(Ajax ajax)
         {
             // add in authentication header
+            
             ajax.addHeader("Authorization",
                 "Basic " + System.Convert.ToBase64String(System.Text.Encoding.UTF8.GetBytes(string.Format("{0}:{1}", _token, _secret))));
             ajax.addHeader("Cookie", string.Empty);
@@ -539,53 +542,19 @@ namespace FeedFM
         /// <summary>
         /// Ensure we've got a clientId
         /// </summary>
-        private IEnumerator EnsureClientId()
+        private void LoadClientId()
         {
             if (_baseClientId != null)
             {
-                yield break;
+                return;
             }
 
             if (PlayerPrefs.HasKey("feedfm.client_id"))
             {
                 // have one already, so use it
                 _baseClientId = PlayerPrefs.GetString("feedfm.client_id");
-                yield break;
             }
-            // need to get an id
-
-            while (true)
-            {
-                Ajax ajax = new Ajax(Ajax.RequestType.POST, API_SERVER_BASE + "/client");
-
-                yield return StartCoroutine(SignedRequest(ajax));
-
-                if (ajax.success)
-                {
-                    _baseClientId = ajax.GetClientIDFromResponseSession();
-
-                    try
-                    {
-                        PlayerPrefs.SetString("feedfm.client_id", _baseClientId);
-                    }
-                    catch (PlayerPrefsException)
-                    {
-                        // ignore, 
-                    }
-
-                    yield break;
-                }
-                else if (ajax.HasErrorCode(FeedError.InvalidRegion))
-                {
-                    // user isn't in a valid region, so can't play anything
-                    Available = false;
-                    OnSession?.Invoke(false, "Invalid Region");
-                    yield break;
-                }
-
-                // no success, so wait bit and then try again
-                yield return WaitForSecondsLibrary.OneSecond;
-            }
+            
         }
 
         public bool MaybeCanSkip()
