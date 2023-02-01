@@ -98,8 +98,15 @@ namespace FeedFM.Utilities
       public IEnumerator Request()
       {
          UnityWebRequest request = null;
-         
-         try
+            if (!headers.ContainsKey("x-feed-sdk"))
+            {
+                headers.Add("x-feed-sdk", "Unity/" + Attributes.ReadOnlyAttribute.VERSION);
+            }
+            if (!headers.ContainsKey("x-feed-platform"))
+            {
+                headers.Add("x-feed-platform", SystemInfo.deviceModel);
+            }
+            try
          {
             if (!fields.ContainsKey("force200"))
             {

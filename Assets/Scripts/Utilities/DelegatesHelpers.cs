@@ -20,9 +20,9 @@ namespace FeedFM.Utilities
     #region Session
     public delegate void SessionDelegate(bool isAvailable, string errMsg);
     public delegate void ClientDelegate(string clientID);
-    internal delegate void SkipDelegate(bool isSuccess);
-    internal delegate void PlayDelegate(Play data);
-    internal delegate void Handler(Session session);
+    public delegate void SkipDelegate(bool isSuccess);
+    public delegate void PlayDelegate(Play data);
+    public delegate void Handler(Session session);
 
     #endregion
 }

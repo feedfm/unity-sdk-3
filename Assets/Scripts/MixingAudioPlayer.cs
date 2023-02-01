@@ -11,7 +11,7 @@ using Logger = FeedFM.Utilities.Logger;
 namespace FeedFM
 {
     [DisallowMultipleComponent]
-    internal sealed class MixingAudioPlayer : MonoBehaviour
+    public sealed class MixingAudioPlayer : MonoBehaviour
     {
         #region Events
 
@@ -61,7 +61,11 @@ namespace FeedFM
         public float Volume
         {
             get => _volume;
-            set => _volume = value;
+            set
+            {
+                _volume = value;
+                _audioSources[_activeAudioSourceIndex].volume = value;
+            }
         }
 
         private AudioSource ActiveAudioSource => _audioSources[_activeAudioSourceIndex];
@@ -284,12 +288,12 @@ namespace FeedFM
                 if (State == PlayerState.Playing)
                 {
                     _currentPlayTime = ActiveAudioSource.time;
-                
                     OnProgressUpdate?.Invoke(CurrentPlay, ActiveAudioSource.time, CurrentPlayDuration);
                 }
 
                 if (_currentAsset != null && _nextAsset != null)
                 {
+                    _currentPlayTime = ActiveAudioSource.time;
                     var msUntilFade = CurrentPlayDuration - FadeDuration - CurrentPlayTime - _currentAsset.play.AudioFile.trimEnd;
                     if (msUntilFade <= 0)
                     {
@@ -328,6 +332,8 @@ namespace FeedFM
                 // start loading up the song
             
                 _unityWebRequest = UnityWebRequestMultimedia.GetAudioClip(audioTrack.AudioFile.Url, AudioType.MPEG); // TODO: Ask about AudioType
+
+                ((DownloadHandlerAudioClip)_unityWebRequest.downloadHandler).streamAudio = true; // Enable stream audio so the music will stream instead of fully downloading before starting
                 yield return _unityWebRequest.SendWebRequest();
             
                 AudioClip clip = null;

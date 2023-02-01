@@ -84,8 +84,8 @@ namespace FeedFM
 */
     
     [DisallowMultipleComponent]
-    internal sealed class Session : MonoBehaviour
-    {
+    public sealed class Session : MonoBehaviour
+    {   
         [SerializeField] private int _maxNumberOfRetries = 3;
         
         #region Events
@@ -123,15 +123,13 @@ namespace FeedFM
         private PendingRequest _pendingRequest;
         private PendingRequest _pendingSessionRequest;
         public const string EXPORT_CLIENT_ID_PREFIX = "fmcidv1:";
-        private string _fullClientId = string.Empty;
 
         public string ClientId
         {
-            get => _fullClientId;
+            get => $"{EXPORT_CLIENT_ID_PREFIX}{_baseClientId}";
             set
             {
                 _baseClientId = value.Substring(EXPORT_CLIENT_ID_PREFIX.Length);
-                _fullClientId = string.Format("{0}{1}", EXPORT_CLIENT_ID_PREFIX, _baseClientId);
                 PlayerPrefs.SetString("feedfm.client_id", _baseClientId);
             }
         }
