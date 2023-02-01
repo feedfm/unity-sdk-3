@@ -27,7 +27,7 @@ openupm add com.feedfm.unity-sdk
 - click **+**
 - select **Add package by name..**. or **Add package from git URL...**
 - paste `com.feedfm.unity-sdk into name`
-- paste `0.0.1` into version
+- paste `0.0.13` into version
 - click **Add**
 
 Alternatively, merge the snippet to Packages/manifest.json
@@ -44,7 +44,7 @@ Alternatively, merge the snippet to Packages/manifest.json
         }
     ],
     "dependencies": {
-        "com.feedfm.unity-sdk": "0.0.1"
+        "com.feedfm.unity-sdk": "0.0.13"
     }
 }
 ```
