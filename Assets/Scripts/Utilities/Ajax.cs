@@ -98,13 +98,17 @@ namespace FeedFM.Utilities
       public IEnumerator Request()
       {
          UnityWebRequest request = null;
-            if (!headers.ContainsKey("x-feed-sdk"))
+            if (!headers.ContainsKey("x-feed-sdk-version"))
             {
-                headers.Add("x-feed-sdk", "Unity/" + Attributes.ReadOnlyAttribute.VERSION);
+                headers.Add("x-feed-sdk-version", Attributes.ReadOnlyAttribute.VERSION);
             }
             if (!headers.ContainsKey("x-feed-platform"))
             {
-                headers.Add("x-feed-platform", SystemInfo.deviceModel);
+                headers.Add("x-feed-platform", "Unity");
+            }
+            if (!headers.ContainsKey("x-feed-device"))
+            {
+                headers.Add("x-feed-device", SystemInfo.deviceModel);
             }
             try
          {

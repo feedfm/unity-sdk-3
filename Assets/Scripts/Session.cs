@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.Security.Cryptography;
 using FeedFM.Attributes;
 using FeedFM.Extensions;
 using FeedFM.Models;
@@ -153,7 +154,7 @@ namespace FeedFM
             // we haven't started playing any music yet
             startedPlayback = false;
             _pendingSessionRequest = new PendingRequest();
-            // pessimistically assume we're out of the US
+            // Assume we have no session
             Available = false;
             LoadClientId();
         }
@@ -304,8 +305,11 @@ namespace FeedFM
             
             ajax.addHeader("Authorization",
                 "Basic " + System.Convert.ToBase64String(System.Text.Encoding.UTF8.GetBytes(string.Format("{0}:{1}", _token, _secret))));
-            ajax.addHeader("Cookie", string.Empty);
 
+            if (_baseClientId != null)
+            {
+                ajax.addHeader("Cookie", "cid=" + _baseClientId);
+            }
             yield return StartCoroutine(ajax.Request());
 
             if (ajax.IsRequestError(FeedError.BadCredentials))
