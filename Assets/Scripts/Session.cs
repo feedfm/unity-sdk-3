@@ -153,7 +153,7 @@ namespace FeedFM
         {
             // we haven't started playing any music yet
             startedPlayback = false;
-            _pendingSessionRequest = new PendingRequest();
+            if (_pendingSessionRequest == null) _pendingSessionRequest = new PendingRequest();
             // Assume we have no session
             Available = false;
             LoadClientId();
@@ -173,6 +173,8 @@ namespace FeedFM
             {
                 ajax.addParameter("client_id", _baseClientId);
             }
+
+            if (_pendingSessionRequest == null) _pendingSessionRequest = new PendingRequest();
 
             while (_pendingSessionRequest.retryCount < _maxNumberOfRetries)
             {

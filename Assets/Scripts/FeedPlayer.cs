@@ -101,6 +101,10 @@ namespace FeedFM
             InitializeRequiredComponents();
             SetupSession();
             SetupMixingAudioPlayer();
+        }
+
+        private void Start()
+        {
             FetchSession();
         }
 
